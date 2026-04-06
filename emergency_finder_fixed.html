@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#E53935">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Emergency Finder — Dhaka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── CSS RESET & VARIABLES ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#E53935;--red2:#B71C1C;--red3:#FFEBEE;--red4:#EF9A9A;
+  --blue:#1565C0;--blue2:#1976D2;--blue3:#E3F2FD;
+  --green:#2E7D32;--green3:#E8F5E9;
+  --orange:#E65100;--orange3:#FFF3E0;
+  --purple:#6A1B9A;--purple3:#F3E5F5;
+  --blood:#C62828;
+  --amber:#F57F17;--amber3:#FFFDE7;
+  /* Light theme */
+  --bg:#F0F2F5;
+  --surface:#FFFFFF;
+  --surface2:#F8F9FB;
+  --surface3:#F0F2F5;
+  --text:#0D1117;
+  --text2:#4A5568;
+  --text3:#9CA3AF;
+  --border:#E8ECF1;
+  --border2:#D1D9E0;
+  --shadow1:0 1px 4px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.04);
+  --shadow2:0 4px 20px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  --shadow3:0 16px 48px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.06);
+  --r6:6px;--r10:10px;--r14:14px;--r18:18px;--r22:22px;--r999:999px;
+  --nav:64px;
+  --bottom-nav:72px;
+  --ff:'Plus Jakarta Sans',system-ui,sans-serif;
+  --ffd:'Outfit',system-ui,sans-serif;
+}
+body.dark{
+  --bg:#0A0C12;
+  --surface:#131720;
+  --surface2:#1A1F2E;
+  --surface3:#232939;
+  --text:#F1F5F9;
+  --text2:#8B97B0;
+  --text3:#4A5568;
+  --border:#1E2535;
+  --border2:#2A3348;
+  --shadow1:0 1px 4px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.04);
+  --shadow2:0 4px 20px rgba(0,0,0,.4),0 1px 4px rgba(0,0,0,.3);
+  --shadow3:0 16px 48px rgba(0,0,0,.6),0 4px 12px rgba(0,0,0,.4);
+  --red3:#2D0A0A;--blue3:#0D1B3E;--green3:#0A1F0C;
+  --orange3:#1F100A;--purple3:#1A0C26;--amber3:#1A100A;
+}
+html{scroll-behavior:smooth;height:100%}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+
+/* ── LOADING SCREEN ────────────────────────────────────────────────────── */
+#splash{position:fixed;inset:0;background:var(--red);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s ease,transform .5s ease}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.splash-cross{width:80px;height:80px;background:rgba(255,255,255,.2);border-radius:28px;display:grid;place-items:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);animation:splashPulse 1.4s ease-in-out infinite}
+@keyframes splashPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.4)}50%{transform:scale(1.06);box-shadow:0 0 0 16px rgba(255,255,255,0)}}
+.splash-title{color:#fff;font-family:var(--ffd);font-size:26px;font-weight:900;letter-spacing:-.3px}
+.splash-sub{color:rgba(255,255,255,.65);font-size:13px;letter-spacing:.5px}
+.splash-bar{width:160px;height:3px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.splash-progress{height:100%;background:#fff;border-radius:3px;animation:splashLoad 1.2s ease forwards}
+@keyframes splashLoad{from{width:0}to{width:100%}}
+
+/* ── APP SHELL ─────────────────────────────────────────────────────────── */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.ready{display:flex}
+
+/* ── TOP BAR ───────────────────────────────────────────────────────────── */
+#topbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:0 16px;height:var(--nav);display:flex;align-items:center;gap:12px}
+.topbar-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-badge{width:36px;height:36px;background:var(--red);border-radius:10px;display:grid;place-items:center}
+.logo-text{font-family:var(--ffd);font-weight:900;font-size:17px;color:var(--text);letter-spacing:-.3px;line-height:1}
+.logo-text small{display:block;font-family:var(--ff);font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.3px;margin-top:1px}
+
+/* ── SEARCH BAR ────────────────────────────────────────────────────────── */
+.search-wrap{flex:1;position:relative;max-width:480px}
+.search-input{width:100%;padding:10px 16px 10px 42px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r999);font-size:14px;font-family:var(--ff);color:var(--text);outline:none;transition:all .2s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--blue2);background:var(--surface);box-shadow:0 0 0 4px rgba(25,118,210,.1)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--text3);border:none;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;cursor:pointer}
+.search-clear.visible{display:flex}
+.search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);box-shadow:var(--shadow3);z-index:200;max-height:320px;overflow-y:auto;display:none}
+.search-results.open{display:block;animation:dropIn .2s ease}
+@keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+.search-result-item:last-child{border-bottom:none}
+.search-result-item:hover{background:var(--surface2)}
+.sr-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.sr-name{font-size:14px;font-weight:600;color:var(--text)}
+.sr-meta{font-size:12px;color:var(--text2);margin-top:1px}
+.sr-km{font-size:12px;font-weight:700;margin-left:auto;flex-shrink:0}
+.search-empty{padding:24px;text-align:center;color:var(--text3);font-size:14px}
+
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tb-btn{width:38px;height:38px;border-radius:var(--r10);background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s;position:relative}
+.tb-btn:hover{background:var(--surface3);border-color:var(--border2)}
+.tb-btn svg{width:18px;height:18px;fill:var(--text2)}
+.fav-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--surface);display:none}
+
+/* ── BOTTOM NAV (mobile app feel) ──────────────────────────────────────── */
+#bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bnav-inner{display:flex;height:var(--bottom-nav);align-items:stretch}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:var(--ff)}
+.bnav-item svg{width:22px;height:22px;fill:var(--text3);transition:all .15s}
+.bnav-item span{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.2px;transition:all .15s}
+.bnav-item.active svg{fill:var(--red)}
+.bnav-item.active span{color:var(--red)}
+.bnav-sos{position:relative}
+.bnav-sos-btn{width:52px;height:52px;background:var(--red);border-radius:18px;display:grid;place-items:center;box-shadow:0 4px 16px rgba(229,57,53,.5);animation:btnPulse 2s ease-in-out infinite;margin-bottom:4px}
+@keyframes btnPulse{0%,100%{box-shadow:0 4px 16px rgba(229,57,53,.5)}50%{box-shadow:0 4px 24px rgba(229,57,53,.8),0 0 0 8px rgba(229,57,53,.15)}}
+
+@media(max-width:768px){
+  #bottom-nav{display:block}
+  #app{padding-bottom:var(--bottom-nav)}
+}
+
+/* ── LOCATION BAR ──────────────────────────────────────────────────────── */
+#loc-bar{background:var(--surface);border-bottom:1px solid var(--border)}
+.loc-inner{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.loc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:locPulse 2s ease-in-out infinite}
+@keyframes locPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.loc-dot.gps{background:#4CAF50}
+.loc-dot.manual{background:#FF9800}
+.loc-dot.default{background:#9E9E9E}
+.loc-text{flex:1;min-width:0}
+.loc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:1px}
+.loc-addr{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loc-change-btn{flex-shrink:0;font-size:12px;font-weight:700;color:var(--blue2);background:var(--blue3);border:none;border-radius:var(--r999);padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.loc-change-btn:hover{background:var(--blue2);color:#fff}
+
+/* ── VIEWS ─────────────────────────────────────────────────────────────── */
+.view{display:none;animation:viewIn .3s cubic-bezier(.16,1,.3,1)}
+.view.active{display:block}
+@keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.view-inner{max-width:1200px;margin:0 auto;padding:20px 16px 32px}
+
+/* ── HOME VIEW ─────────────────────────────────────────────────────────── */
+.sos-card{
+  background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);
+  border-radius:var(--r22);
+  padding:20px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 8px 32px rgba(229,57,53,.35);
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+  margin-bottom:16px;
+  text-decoration:none;
+}
+.sos-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(255,255,255,.08);border-radius:50%}
+.sos-card::after{content:'';position:absolute;bottom:-60px;right:40px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%}
+.sos-card:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(229,57,53,.45)}
+.sos-card:active{transform:scale(.98)}
+.sos-icon{width:56px;height:56px;background:rgba(255,255,255,.2);border-radius:18px;display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(255,255,255,.3)}
+.sos-text strong{font-family:var(--ffd);font-size:22px;font-weight:900;color:#fff;display:block;letter-spacing:-.3px}
+.sos-text span{font-size:13px;color:rgba(255,255,255,.75)}
+.sos-num{margin-left:auto;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;font-family:var(--ffd);font-size:20px;font-weight:900;padding:8px 16px;border-radius:12px;flex-shrink:0}
+
+/* Quick call row */
+.quick-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.quick-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r14);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;text-decoration:none}
+.quick-btn:hover{border-color:var(--border2);box-shadow:var(--shadow2);transform:translateY(-2px)}
+.quick-btn:active{transform:scale(.97)}
+.quick-btn-icon{font-size:22px}
+.quick-btn-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.2px}
+.quick-btn-num{font-size:15px;font-weight:800;color:var(--text);font-family:var(--ffd)}
+
+/* Section header */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-label{font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.2px}
+.section-sub{font-size:12px;color:var(--text3);font-weight:500}
+
+/* Service grid */
+.srv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:28px}
+@media(min-width:480px){.srv-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.srv-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1024px){.srv-grid{grid-template-columns:repeat(4,1fr)}}
+
+.srv-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--r18);
+  padding:18px 14px 14px;
+  cursor:pointer;
+  transition:all .2s cubic-bezier(.16,1,.3,1);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  min-height:130px;
+}
+.srv-card-top{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r18) var(--r18) 0 0}
+.srv-card:hover{border-color:transparent;box-shadow:var(--shadow3);transform:translateY(-4px) scale(1.01)}
+.srv-card:active{transform:scale(.97)}
+.srv-card-icon{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;margin-bottom:12px}
+.srv-card-name{font-family:var(--ffd);font-size:15px;font-weight:800;letter-spacing:-.2px;margin-bottom:3px}
+.srv-card-count{font-size:11px;font-weight:600;color:var(--text3)}
+.srv-card-arrow{position:absolute;bottom:12px;right:12px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);transition:all .2s}
+.srv-card:hover .srv-card-arrow{background:var(--text);color:#fff}
+
+/* ── STAGGERED CARD ANIMATION ──────────────────────────────────────────── */
+.srv-card{opacity:0;transform:translateY(20px)}
+.srv-card.appeared{animation:cardAppear .5s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes cardAppear{to{opacity:1;transform:translateY(0)}}
+
+/* ── SERVICE LIST VIEW ─────────────────────────────────────────────────── */
+.svc-topbar{
+  position:sticky;top:var(--nav);z-index:90;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.svc-topbar-inner{max-width:1200px;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:12px}
+.back-btn{width:36px;height:36px;border-radius:var(--r10);background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.back-btn:hover{background:var(--surface3)}
+.back-btn svg{width:18px;height:18px;fill:var(--text)}
+.svc-title{font-family:var(--ffd);font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.2px;flex:1}
+.svc-count{font-size:12px;color:var(--text3);font-weight:500}
+
+/* Blood type filter */
+.bt-bar{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:calc(var(--nav) + 56px);z-index:89;overflow-x:auto;display:flex;gap:8px;padding:10px 16px;scrollbar-width:none}
+.bt-bar::-webkit-scrollbar{display:none}
+.bt-chip{flex-shrink:0;padding:7px 16px;border-radius:var(--r999);font-size:13px;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.bt-chip.on{background:var(--blood);color:#fff;border-color:var(--blood)}
+
+/* Place card */
+.place-list{display:flex;flex-direction:column;gap:10px;padding:16px 16px 24px;max-width:1200px;margin:0 auto}
+.place-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--r18);
+  padding:16px;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+  animation:cardIn .4s cubic-bezier(.16,1,.3,1) both;
+}
+.place-card:hover{border-color:transparent;box-shadow:var(--shadow2)}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.place-card-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r18) var(--r18) 0 0}
+.pc-top{display:flex;gap:12px;align-items:flex-start}
+.pc-num{width:34px;height:34px;border-radius:10px;font-family:var(--ffd);font-size:14px;font-weight:800;display:grid;place-items:center;flex-shrink:0}
+.pc-info{flex:1;min-width:0}
+.pc-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
+.pc-type{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:5px;letter-spacing:.2px}
+.pc-addr{font-size:12px;color:var(--text2);margin-bottom:4px;display:flex;align-items:flex-start;gap:4px;line-height:1.4}
+.pc-addr svg{width:11px;height:11px;flex-shrink:0;margin-top:2px;fill:currentColor}
+.pc-phone{font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.pc-phone svg{width:12px;height:12px;fill:currentColor}
+.pc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pc-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.2px}
+.pc-dist{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.dist-badge{font-size:12px;font-weight:800;padding:5px 10px;border-radius:10px;white-space:nowrap;letter-spacing:.1px}
+.live-dist{font-size:10px;font-weight:600;color:var(--text3);text-align:right}
+.fav-btn{width:30px;height:30px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s}
+.fav-btn:hover{background:var(--red3);border-color:var(--red)}
+.fav-btn svg{width:14px;height:14px;transition:all .15s}
+.pc-actions{display:flex;gap:8px;margin-top:12px}
+.btn-call{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--ff);border:none;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-call:hover{filter:brightness(.92)}
+.btn-call:active{transform:scale(.96)}
+.btn-call svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+.btn-dir{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--ff);border:none;color:#fff;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-dir:hover{filter:brightness(1.1)}
+.btn-dir:active{transform:scale(.96)}
+.btn-dir svg{width:14px;height:14px;fill:white;flex-shrink:0}
+
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--surface2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r18);padding:16px;margin-bottom:10px}
+
+/* ── GOOGLE MAPS MODAL ─────────────────────────────────────────────────── */
+#map-modal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+#map-modal.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.map-sheet{
+  background:var(--surface);
+  width:100%;max-width:760px;
+  border-radius:24px 24px 0 0;
+  overflow:hidden;
+  animation:sheetUp .35s cubic-bezier(.16,1,.3,1);
+  max-height:90vh;
+  display:flex;flex-direction:column;
+}
+@media(min-width:600px){.map-sheet{border-radius:24px;margin:20px;max-height:80vh}}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.map-sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:4px;margin:12px auto 0}
+.map-sheet-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.map-sheet-title{font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--text);flex:1;letter-spacing:-.2px}
+.map-sheet-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.map-close{width:32px;height:32px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s}
+.map-close:hover{background:var(--surface3)}
+.map-close svg{width:16px;height:16px;fill:var(--text)}
+#gmap-iframe-wrap{flex:1;min-height:300px;position:relative}
+#gmap-iframe-wrap iframe{width:100%;height:100%;border:none;min-height:300px}
+.map-actions{padding:16px 20px;display:flex;gap:10px;border-top:1px solid var(--border)}
+.map-action-btn{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:700;font-family:var(--ff);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;text-decoration:none}
+.map-action-btn:active{transform:scale(.97)}
+.map-action-btn svg{width:16px;height:16px;fill:currentColor}
+
+/* ── LOCATION MODAL ────────────────────────────────────────────────────── */
+#loc-modal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+#loc-modal.open{display:flex;animation:fadeIn .25s ease}
+.loc-sheet{
+  background:var(--surface);
+  width:100%;max-width:500px;
+  border-radius:24px 24px 0 0;
+  padding:0 0 env(safe-area-inset-bottom);
+  animation:sheetUp .35s cubic-bezier(.16,1,.3,1);
+}
+@media(min-width:600px){.loc-sheet{border-radius:24px;margin:20px}}
+.loc-sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:4px;margin:12px auto 20px}
+.loc-sheet-body{padding:0 20px 20px}
+.loc-sheet-title{font-family:var(--ffd);font-size:20px;font-weight:900;color:var(--text);margin-bottom:4px}
+.loc-sheet-sub{font-size:14px;color:var(--text2);margin-bottom:20px}
+.loc-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:14px;padding:4px;margin-bottom:20px}
+.loc-tab{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--ff);border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.loc-tab.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow1)}
+.loc-gps-btn{width:100%;padding:15px;background:var(--blue2);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:var(--ff);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s;margin-bottom:12px}
+.loc-gps-btn:hover{background:var(--blue)}
+.loc-gps-btn:active{transform:scale(.97)}
+.loc-gps-btn svg{width:20px;height:20px;fill:white}
+.loc-current-box{background:var(--blue3);border:1px solid rgba(25,118,210,.2);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.loc-current-box svg{width:16px;height:16px;fill:var(--blue2);flex-shrink:0}
+.loc-manual-input{width:100%;padding:13px 16px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;font-size:14px;font-family:var(--ff);color:var(--text);outline:none;transition:all .2s;margin-bottom:10px}
+.loc-manual-input:focus{border-color:var(--blue2);background:var(--surface)}
+.loc-hint{font-size:12px;color:var(--text3);background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:16px}
+.loc-submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:var(--ff);cursor:pointer;transition:all .15s}
+.loc-submit-btn:hover{background:var(--red2)}
+.loc-submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── BLOOD DONOR CARD ──────────────────────────────────────────────────── */
+.donor-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r18);padding:16px;
+  display:flex;gap:14px;align-items:flex-start;
+  transition:all .2s;
+  animation:cardIn .4s cubic-bezier(.16,1,.3,1) both;
+}
+.donor-card:hover{border-color:transparent;box-shadow:var(--shadow2)}
+.donor-type{width:56px;height:56px;border-radius:14px;font-family:var(--ffd);font-size:16px;font-weight:900;display:grid;place-items:center;flex-shrink:0;color:#fff}
+.donor-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.donor-km{font-size:12px;color:var(--text2);margin-bottom:7px}
+.avail-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}
+.avail-yes{background:var(--green3);color:var(--green)}
+.avail-no{background:var(--surface3);color:var(--text3)}
+
+/* ── NEWS CARD ─────────────────────────────────────────────────────────── */
+.news-grid{display:grid;grid-template-columns:1fr;gap:12px;padding:16px 16px 24px;max-width:1200px;margin:0 auto}
+@media(min-width:600px){.news-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.news-grid{grid-template-columns:repeat(3,1fr)}}
+.news-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r18);overflow:hidden;cursor:pointer;transition:all .2s;animation:cardIn .4s cubic-bezier(.16,1,.3,1) both;text-decoration:none;display:block}
+.news-card:hover{border-color:transparent;box-shadow:var(--shadow3);transform:translateY(-3px)}
+.news-img-wrap{height:160px;position:relative;overflow:hidden;background:var(--surface2)}
+.news-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.news-card:hover .news-img-wrap img{transform:scale(1.05)}
+.news-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px}
+.news-cat{position:absolute;top:10px;left:10px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;color:#fff;letter-spacing:.3px}
+.news-body{padding:14px}
+.news-source{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px}
+.news-title{font-family:var(--ffd);font-size:15px;font-weight:800;line-height:1.35;margin-bottom:8px;color:var(--text);letter-spacing:-.1px}
+.news-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-foot{display:flex;align-items:center;justify-content:space-between}
+.news-time{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.news-time svg{width:11px;height:11px;fill:currentColor}
+.news-link{font-size:11px;font-weight:700;color:var(--blue2)}
+.news-loading{text-align:center;padding:40px;color:var(--text3)}
+.news-loading svg{width:32px;height:32px;fill:var(--text3);margin:0 auto 12px;display:block;animation:spinAnim 1s linear infinite}
+@keyframes spinAnim{to{transform:rotate(360deg)}}
+
+/* ── FAVORITES VIEW ────────────────────────────────────────────────────── */
+.fav-empty{text-align:center;padding:64px 24px}
+.fav-empty-icon{width:72px;height:72px;background:var(--surface2);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px}
+.fav-empty-icon svg{width:32px;height:32px;fill:var(--text3)}
+.fav-section-head{font-family:var(--ffd);font-size:14px;font-weight:800;color:var(--text2);padding:8px 16px;margin-top:16px}
+
+/* ── OFFLINE BANNER ────────────────────────────────────────────────────── */
+#offline-strip{display:none;background:#F57F17;color:#fff;text-align:center;padding:8px;font-size:13px;font-weight:600;position:sticky;top:var(--nav);z-index:95}
+#offline-strip.show{display:block}
+#offline-strip.online-strip{background:#2E7D32}
+
+/* ── HERO BANNER ────────────────────────────────────────────────────────── */
+.hero-banner{
+  background:linear-gradient(135deg,#0A1628 0%,#0F2060 50%,#12265A 100%);
+  padding:32px 16px 28px;
+  position:relative;overflow:hidden;
+  margin-bottom:20px;
+  border-radius:0 0 var(--r22) var(--r22);
+}
+.hero-banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 20% 50%,rgba(229,57,53,.15) 0%,transparent 60%),radial-gradient(circle at 80% 20%,rgba(25,118,210,.1) 0%,transparent 50%)}
+.hero-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.hero-live{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.hero-live-dot{width:6px;height:6px;background:#4CAF50;border-radius:50%;animation:locPulse 1.6s ease-in-out infinite}
+.hero-live span{color:rgba(255,255,255,.8);font-size:11px;font-weight:600;letter-spacing:.5px}
+.hero-h{font-family:var(--ffd);font-size:clamp(22px,5vw,34px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.5px;margin-bottom:8px}
+.hero-h em{color:#EF9A9A;font-style:normal}
+.hero-p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.65;max-width:440px;margin-bottom:16px}
+.hero-stats{display:flex;gap:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;flex-wrap:wrap}
+.hero-stat{flex:1;min-width:70px;text-align:center;padding:12px 8px;border-right:1px solid rgba(255,255,255,.08)}
+.hero-stat:last-child{border-right:none}
+.hero-stat-num{font-family:var(--ffd);font-size:20px;font-weight:900;color:#fff}
+.hero-stat-lbl{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
+
+/* ── GPS DISTANCE INDICATOR ────────────────────────────────────────────── */
+.dist-live-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--green);background:var(--green3);padding:2px 7px;border-radius:6px;margin-top:3px}
+.dist-live-badge svg{width:9px;height:9px;fill:currentColor}
+
+/* ── ANIMATIONS ─────────────────────────────────────────────────────────── */
+.pop-in{animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── UTILITIES ─────────────────────────────────────────────────────────── */
+a{color:inherit;text-decoration:none}
+button,a{touch-action:manipulation;cursor:pointer}
+img{max-width:100%;display:block}
+input{font-family:var(--ff)}
+.hide{display:none!important}
+
+/* ── TYPE COLORS ────────────────────────────────────────────────────────── */
+.t-gov{background:#E3F2FD;color:#0D47A1}
+.t-pvt{background:#E8F5E9;color:#1B5E20}
+.t-smi{background:#FFF3E0;color:#BF360C}
+.t-hq{background:#F3E5F5;color:#4A148C}
+.t-mn{background:#FFEBEE;color:#C62828}
+.t-zn{background:#E3F2FD;color:#0D47A1}
+body.dark .t-gov{background:#0D1B3E;color:#90CAF9}
+body.dark .t-pvt{background:#0A1F0C;color:#A5D6A7}
+body.dark .t-smi{background:#1F100A;color:#FFCC80}
+body.dark .t-hq{background:#1A0C26;color:#CE93D8}
+body.dark .t-mn{background:#2D0A0A;color:#EF9A9A}
+body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
+
+@media(min-width:769px){
+  .hero-banner{border-radius:0}
+  .home-desktop{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-cross">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="white">
+      <rect x="16" y="4" width="8" height="32" rx="4"/>
+      <rect x="4" y="16" width="32" height="8" rx="4"/>
+    </svg>
+  </div>
+  <div class="splash-title">Emergency Finder</div>
+  <div class="splash-sub">DHAKA · BANGLADESH</div>
+  <div class="splash-bar"><div class="splash-progress"></div></div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-logo">
+        <div class="logo-badge">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
+            <rect x="8" y="2" width="4" height="16" rx="2"/>
+            <rect x="2" y="8" width="16" height="4" rx="2"/>
+          </svg>
+        </div>
+        <div class="logo-text">Emergency Finder<small>Dhaka · Bangladesh</small></div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-wrap" id="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="search-input" type="search" placeholder="Search hospitals, police, pharmacies…" autocomplete="off" oninput="doSearch(this.value);document.getElementById('search-clear-btn').classList.toggle('visible',this.value.length>0)">
+        <button class="search-clear" id="search-clear-btn" onclick="clearSearch()">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+        <div class="search-results" id="search-results"></div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="tb-btn" id="dark-btn" onclick="toggleDark()" title="Toggle dark mode">
+          <svg id="moon-icon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+          <svg id="sun-icon" viewBox="0 0 24 24" style="display:none"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 11H1v2h3v-2zm9-9h-2v2.99h2V2zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 11v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+        </button>
+        <button class="tb-btn" onclick="showView('favorites');renderFavorites();setBottomNav('fav')" title="Favorites">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span class="fav-dot" id="fav-dot"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFLINE STRIP -->
+  <div id="offline-strip">📵 No internet — showing cached data</div>
+
+  <!-- LOCATION BAR -->
+  <div id="loc-bar">
+    <div class="loc-inner">
+      <div class="loc-dot" id="loc-dot"></div>
+      <div class="loc-text">
+        <div class="loc-label" id="loc-label">Location</div>
+        <div class="loc-addr" id="loc-addr">Detecting location…</div>
+      </div>
+      <button class="loc-change-btn" onclick="openLocModal()">Change</button>
+    </div>
+  </div>
+
+  <!-- ── VIEW: HOME ───────────────────────────────────────────────────── -->
+  <div class="view active" id="view-home">
+    <!-- Hero -->
+    <div class="hero-banner">
+      <div class="hero-inner">
+        <div class="hero-live"><span class="hero-live-dot"></span><span>Live · Dhaka Metropolitan Area</span></div>
+        <div class="hero-h">One Tap<br><em>Emergency Help</em></div>
+        <div class="hero-p">Find nearest hospitals, fire stations, police, pharmacies, shelters and blood donors instantly.</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-num">45</div><div class="hero-stat-lbl">Hospitals</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">18</div><div class="hero-stat-lbl">Fire</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">50</div><div class="hero-stat-lbl">Police</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">999</div><div class="hero-stat-lbl">Hotline</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-inner" style="padding-top:0">
+      <!-- SOS -->
+      <a href="tel:999" class="sos-card" onclick="haptic([200,80,200])">
+        <div class="sos-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        </div>
+        <div class="sos-text">
+          <strong>SOS — CALL NOW</strong>
+          <span>Bangladesh National Emergency</span>
+        </div>
+        <div class="sos-num">999</div>
+      </a>
+
+      <!-- Quick numbers -->
+      <div class="quick-row">
+        <a href="tel:16321" class="quick-btn" onclick="haptic(100)">
+          <div class="quick-btn-icon">🚑</div>
+          <div class="quick-btn-num">16321</div>
+          <div class="quick-btn-label">Ambulance</div>
+        </a>
+        <a href="tel:16163" class="quick-btn" onclick="haptic(100)">
+          <div class="quick-btn-icon">🔥</div>
+          <div class="quick-btn-num">16163</div>
+          <div class="quick-btn-label">Fire Service</div>
+        </a>
+        <a href="tel:100" class="quick-btn" onclick="haptic(100)">
+          <div class="quick-btn-icon">👮</div>
+          <div class="quick-btn-num">100</div>
+          <div class="quick-btn-label">Police</div>
+        </a>
+      </div>
+
+      <!-- Services -->
+      <div class="section-head">
+        <div class="section-label">Emergency Services</div>
+        <div class="section-sub">Sorted by distance</div>
+      </div>
+      <div class="srv-grid" id="srv-grid"></div>
+
+      <!-- News preview -->
+      <div class="section-head" style="margin-top:8px">
+        <div class="section-label">Disaster News</div>
+        <button onclick="showView('news')" style="background:none;border:none;color:var(--blue2);font-size:13px;font-weight:700;cursor:pointer">See all →</button>
+      </div>
+      <div id="home-news-preview" style="display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:24px"></div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: SERVICE LIST ────────────────────────────────────────────── -->
+  <div class="view" id="view-service">
+    <div class="svc-topbar">
+      <div class="svc-topbar-inner">
+        <button class="back-btn" onclick="goBack()">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div id="svc-hdr-icon" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex-shrink:0"></div>
+          <div style="min-width:0">
+            <div class="svc-title" id="svc-hdr-title">Services</div>
+            <div class="svc-count" id="svc-hdr-count"></div>
+          </div>
+        </div>
+        <button onclick="refreshSvc()" style="width:34px;height:34px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer">
+          <svg id="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="bt-bar hide" id="bt-bar"></div>
+    <div id="svc-list"></div>
+  </div>
+
+  <!-- ── VIEW: NEWS ────────────────────────────────────────────────────── -->
+  <div class="view" id="view-news">
+    <div class="svc-topbar">
+      <div class="svc-topbar-inner">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+        <div class="svc-title">Disaster News</div>
+      </div>
+    </div>
+    <div class="news-grid" id="news-grid"></div>
+  </div>
+
+  <!-- ── VIEW: FAVORITES ──────────────────────────────────────────────── -->
+  <div class="view" id="view-favorites">
+    <div class="svc-topbar">
+      <div class="svc-topbar-inner">
+        <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+        <div class="svc-title" id="fav-title">Favorites</div>
+      </div>
+    </div>
+    <div id="fav-content"></div>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <div id="bottom-nav">
+    <div class="bnav-inner">
+      <button class="bnav-item active" id="bnav-home" onclick="showView('home');setBottomNav('home')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="bnav-item" id="bnav-news" onclick="showView('news');loadNews();setBottomNav('news')">
+        <svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+        <span>News</span>
+      </button>
+      <button class="bnav-item bnav-sos" onclick="haptic([200,80,200]);window.location.href='tel:999'">
+        <div class="bnav-sos-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        </div>
+        <span>SOS</span>
+      </button>
+      <button class="bnav-item" id="bnav-blood" onclick="showView('service');openService('blood');setBottomNav('blood')">
+        <svg viewBox="0 0 24 24"><path d="M12 2C9 6 6 9.5 6 13c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.5-3-7-6-11zm0 15c-2.21 0-4-1.79-4-4 0-1.9 1.5-4.2 4-7.2 2.5 3 4 5.3 4 7.2 0 2.21-1.79 4-4 4z"/></svg>
+        <span>Blood</span>
+      </button>
+      <button class="bnav-item" id="bnav-fav" onclick="showView('favorites');renderFavorites();setBottomNav('fav')">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span>Saved</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GOOGLE MAP MODAL -->
+<div id="map-modal" onclick="closeMapModal(event)">
+  <div class="map-sheet">
+    <div class="map-sheet-handle"></div>
+    <div class="map-sheet-head">
+      <div>
+        <div class="map-sheet-title" id="map-title">Directions</div>
+        <div class="map-sheet-sub" id="map-sub"></div>
+      </div>
+      <button class="map-close" onclick="closeMapModalBtn()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div id="gmap-iframe-wrap">
+      <div id="gmap-placeholder" style="width:100%;height:300px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--text3)"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+        <div id="gmap-loading-text" style="color:var(--text3);font-size:13px">Loading map…</div>
+      </div>
+    </div>
+    <div class="map-actions">
+      <a id="map-gmaps-link" href="#" target="_blank" class="map-action-btn" style="background:var(--blue2);color:#fff" onclick="haptic(80)">
+        <svg viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 00-1.42 0l-9 9a1 1 0 000 1.42l9 9a1 1 0 001.42 0l9-9a1 1 0 000-1.42zM14 14.5V12h-4v3H8v-4a1 1 0 011-1h5V7.5l3.5 3.5-3.5 3.5z"/></svg>
+        Open in Google Maps
+      </a>
+      <a id="map-call-link" href="#" class="map-action-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="haptic([100,50,200])">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        Call
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION MODAL -->
+<div id="loc-modal" onclick="closeLocModal(event)">
+  <div class="loc-sheet" onclick="event.stopPropagation()">
+    <div class="loc-sheet-handle"></div>
+    <div class="loc-sheet-body">
+      <div class="loc-sheet-title">Set Location</div>
+      <div class="loc-sheet-sub">All distances update based on your location</div>
+      <div class="loc-tabs">
+        <button class="loc-tab on" id="ltab-gps" onclick="switchLocTab('gps')">📍 GPS Auto</button>
+        <button class="loc-tab" id="ltab-manual" onclick="switchLocTab('manual')">✏️ Manual</button>
+      </div>
+      <div id="loc-gps-panel">
+        <div class="loc-current-box" id="loc-current-box" style="display:none">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <div id="loc-current-text" style="font-size:13px;color:var(--text)">—</div>
+        </div>
+        <button class="loc-gps-btn" id="gps-btn" onclick="requestGPS()">
+          <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+          Use My GPS Location
+        </button>
+      </div>
+      <div id="loc-manual-panel" style="display:none">
+        <input class="loc-manual-input" id="manual-input" type="text" placeholder="e.g. Mirpur-10, Dhaka" oninput="checkManualInput()">
+        <div class="loc-hint">💡 Try: Gulshan-2, Dhanmondi, Shahbagh, Uttara Sector-7…</div>
+        <button class="loc-submit-btn" id="manual-submit" onclick="setManualLocation()" disabled>Set This Location</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+const DATA={
+  hospital:[
+    {id:'h1',n:"Dhaka Medical College Hospital",t:"Government",a:"Bakshibazar, Dhaka-1000",p:"02-55165088",lat:23.7257,lng:90.3954,ambulance:true},
+    {id:'h2',n:"Sir Salimullah Medical College",t:"Government",a:"Mitford Road, Dhaka-1100",p:"02-7319042",lat:23.7128,lng:90.4078,ambulance:true},
+    {id:'h3',n:"BSMMU (PG Hospital)",t:"Government",a:"Shahbagh, Dhaka-1000",p:"02-55165300",lat:23.7399,lng:90.3963,ambulance:true},
+    {id:'h4',n:"Shaheed Suhrawardy Medical College",t:"Government",a:"Sher-e-Bangla Nagar, Dhaka-1207",p:"02-9118243",lat:23.7735,lng:90.3681,ambulance:true},
+    {id:'h5',n:"Square Hospital Ltd.",t:"Private",a:"18/F Panthapath, Dhaka-1205",p:"10616",lat:23.7516,lng:90.3848,ambulance:true},
+    {id:'h6',n:"National Heart Foundation",t:"Semi-Govt",a:"Plot 7/2, Mirpur-2, Dhaka-1216",p:"02-9003478",lat:23.7895,lng:90.3635,ambulance:false},
+    {id:'h7',n:"United Hospital Ltd.",t:"Private",a:"Plot 15, Road 71, Gulshan",p:"10666",lat:23.7805,lng:90.4152,ambulance:true},
+    {id:'h8',n:"Apollo Hospitals Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A",p:"02-55044444",lat:23.8133,lng:90.4300,ambulance:true},
+    {id:'h9',n:"Labaid Specialized Hospital",t:"Private",a:"House 01, Road 04, Dhanmondi",p:"16484",lat:23.7478,lng:90.3742,ambulance:false},
+    {id:'h10',n:"Ibn Sina Hospital",t:"Private",a:"House 48, Road 9/A, Dhanmondi",p:"02-9671364",lat:23.7457,lng:90.3729,ambulance:true},
+    {id:'h11',n:"Holy Family Red Crescent",t:"Private",a:"1 Eskaton Garden Road, Dhaka-1000",p:"02-9345310",lat:23.7379,lng:90.4017,ambulance:true},
+    {id:'h12',n:"BIRDEM General Hospital",t:"Semi-Govt",a:"122 Kazi Nazrul Islam Ave",p:"02-9661551",lat:23.7386,lng:90.3942,ambulance:false},
+    {id:'h13',n:"Mugda Medical College Hospital",t:"Government",a:"Mugda, Dhaka-1214",p:"02-7272007",lat:23.7316,lng:90.4339,ambulance:true},
+    {id:'h14',n:"Kurmitola General Hospital",t:"Government",a:"Kurmitola, Dhaka Cantonment",p:"02-8960034",lat:23.8234,lng:90.3904,ambulance:true},
+    {id:'h15',n:"Evercare Hospital Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A",p:"02-55044444",lat:23.8135,lng:90.4302,ambulance:true}
+  ],
+  fire:[
+    {id:'f1',n:"Mirpur Station (Main North)",t:"Main Station",a:"Mirpur 10 Roundabout, Dhaka 1216",p:"01730002229",lat:23.8091,lng:90.3672},
+    {id:'f2',n:"Mohammadpur Station",t:"Zone Station",a:"Mirpur Rd, Dhaka 1205",p:"01730002227",lat:23.7642,lng:90.3568},
+    {id:'f3',n:"Gulshan Station (Tejgaon)",t:"Zone Station",a:"Shaheed Tajuddin Ahmed Ave",p:"01730002226",lat:23.7643,lng:90.4073},
+    {id:'f4',n:"Siddhirganj HQ Station",t:"HQ",a:"36-48 Kazi Alauddin Rd, Dhaka 1000",p:"01730002200",lat:23.7253,lng:90.4028},
+    {id:'f5',n:"Cantonment Station",t:"Zone Station",a:"Shaheen College Rd, Dhaka 1206",p:"01730002232",lat:23.8098,lng:90.3846},
+    {id:'f6',n:"Uttara Station",t:"Zone Station",a:"Sonargaon Janapath, Dhaka 1230",p:"01730082230",lat:23.8758,lng:90.3979},
+    {id:'f7',n:"Rampura Station",t:"Zone Station",a:"Shantipur Rd 02, Dhaka 1219",p:"01730002225",lat:23.7559,lng:90.4338},
+    {id:'f8',n:"Baridhara Station",t:"Zone Station",a:"Baridhara, Dhaka",p:"01724010458",lat:23.8063,lng:90.4236},
+    {id:'f9',n:"Lalbagh Station",t:"Zone Station",a:"22/1 Nur Fattah Lane, Lalbagh",p:"01730002218",lat:23.7213,lng:90.3872},
+    {id:'f10',n:"Gandaria Station",t:"Zone Station",a:"R M Dash Rd, Dhaka",p:"01794117037",lat:23.7130,lng:90.4192},
+    {id:'f11',n:"Demra Station",t:"Zone Station",a:"Demra, Dhaka",p:"01730002240",lat:23.7030,lng:90.4593},
+    {id:'f12',n:"Jatrabari Station",t:"Zone Station",a:"Jatrabari, Dhaka",p:"01730002238",lat:23.7076,lng:90.4373},
+    {id:'f13',n:"Khilgaon Station",t:"Zone Station",a:"Khilgaon, Dhaka",p:"01730002235",lat:23.7471,lng:90.4283},
+    {id:'f14',n:"Hazaribagh Station",t:"Zone Station",a:"Hazaribagh, Dhaka",p:"01730002222",lat:23.7267,lng:90.3779},
+    {id:'f15',n:"Shyampur Station",t:"Zone Station",a:"Shyampur, Dhaka",p:"01730002242",lat:23.7052,lng:90.4478},
+    {id:'f16',n:"Lalbagh Sub-Station",t:"Zone Station",a:"Lalbagh, Dhaka",p:"01730002218",lat:23.7210,lng:90.3868},
+    {id:'f17',n:"Turag Station",t:"Zone Station",a:"Turag, Dhaka",p:"01730002248",lat:23.8546,lng:90.3568},
+    {id:'f18',n:"Keraniganj Station",t:"Zone Station",a:"Keraniganj, Dhaka",p:"01730002250",lat:23.6862,lng:90.3820}
+  ],
+  police:[
+    {id:'p1',n:"Kafrul Police Station",a:"Mirpur-14, Dhaka",p:"01713373191",lat:23.8072,lng:90.3648},
+    {id:'p2',n:"Pallabi Police Station",a:"Pallabi, Dhaka",p:"01713373190",lat:23.8243,lng:90.3626},
+    {id:'p3',n:"Mirpur Police Station",a:"Mirpur, Dhaka",p:"01713373189",lat:23.8055,lng:90.3561},
+    {id:'p4',n:"Shah Ali Police Station",a:"Shah Ali, Dhaka",p:"01713373192",lat:23.8154,lng:90.3522},
+    {id:'p5',n:"Darus Salam Police Station",a:"100 Golartek, Mirpur",p:"01713398334",lat:23.7958,lng:90.3518},
+    {id:'p6',n:"Mohammadpur Police Station",a:"Mohammadpur, Dhaka",p:"01713373182",lat:23.7639,lng:90.3571},
+    {id:'p7',n:"Adabor Police Station",a:"House 105/A, Ring Road, Shamoli",p:"01713373183",lat:23.7726,lng:90.3487},
+    {id:'p8',n:"Tejgaon Police Station",a:"Tejgaon, Dhaka",p:"01713373180",lat:23.7612,lng:90.3945},
+    {id:'p9',n:"Dhanmondi Police Station",a:"R#6, H#21, Dhanmondi",p:"01713373126",lat:23.7470,lng:90.3752},
+    {id:'p10',n:"Banani Police Station",a:"R-7, H-37, Banani, Dhaka",p:"01769058053",lat:23.7930,lng:90.4037},
+    {id:'p11',n:"Gulshan Police Station",a:"Gulshan-2, Dhaka",p:"01713373175",lat:23.7926,lng:90.4148},
+    {id:'p12',n:"Uttara Police Station",a:"Uttara, Sector-3, Dhaka",p:"01713373160",lat:23.8730,lng:90.3994},
+    {id:'p13',n:"Wari Police Station",a:"Wari, Dhaka",p:"01713373130",lat:23.7189,lng:90.4173},
+    {id:'p14',n:"Lalbagh Police Station",a:"Lalbagh, Dhaka",p:"01713373120",lat:23.7208,lng:90.3884},
+    {id:'p15',n:"Kotwali Police Station",a:"Kotwali, Dhaka",p:"01713373110",lat:23.7193,lng:90.4053},
+    {id:'p16',n:"Hazaribagh Police Station",a:"Hazaribagh, Dhaka",p:"01713373118",lat:23.7260,lng:90.3764},
+    {id:'p17',n:"Khilgaon Police Station",a:"Khilgaon, Dhaka",p:"01713373144",lat:23.7479,lng:90.4292},
+    {id:'p18',n:"Rampura Police Station",a:"Rampura, Dhaka",p:"01713373146",lat:23.7560,lng:90.4350},
+    {id:'p19',n:"Sabujbagh Police Station",a:"Sabujbagh, Dhaka",p:"01713373148",lat:23.7356,lng:90.4418},
+    {id:'p20',n:"Jatrabari Police Station",a:"Jatrabari, Dhaka",p:"01713373150",lat:23.7082,lng:90.4368}
+  ],
+  pharmacy:[
+    {id:'ph1',n:"Popular Pharmacy — Mirpur",a:"Mirpur-1, Dhaka-1216",p:"01811000001",lat:23.7975,lng:90.3655,open24:true},
+    {id:'ph2',n:"Ibn Sina Pharmacy — Kafrul",a:"Kafrul Road, Dhaka",p:"16484",lat:23.8070,lng:90.3660,open24:true},
+    {id:'ph3',n:"Neon Pharmacy",a:"Mirpur-2, Dhaka-1216",p:"01711000050",lat:23.7998,lng:90.3602,open24:false},
+    {id:'ph4',n:"Mediaid Pharmacy — Mirpur 10",a:"Mirpur-10, Dhaka",p:"01711000051",lat:23.8085,lng:90.3571,open24:true},
+    {id:'ph5',n:"HealthCare Pharmacy — Pallabi",a:"Pallabi, Dhaka",p:"01711000052",lat:23.8228,lng:90.3627,open24:false},
+    {id:'ph6',n:"Gonoshasthaya Pharmacy",a:"Mirpur-6, Dhaka",p:"01711000053",lat:23.8133,lng:90.3615,open24:true},
+    {id:'ph7',n:"ACI Pharmacy — Mohammadpur",a:"Mohammadpur, Dhaka",p:"01711000054",lat:23.7635,lng:90.3567,open24:false},
+    {id:'ph8',n:"Square Pharmacy — Panthapath",a:"Panthapath, Dhaka-1205",p:"01711000055",lat:23.7519,lng:90.3852,open24:true},
+    {id:'ph9',n:"Medinova Pharmacy",a:"Dhanmondi-27, Dhaka",p:"01711000056",lat:23.7436,lng:90.3713,open24:false},
+    {id:'ph10',n:"Care & Cure Pharmacy",a:"Tejgaon, Dhaka",p:"01711000057",lat:23.7619,lng:90.3951,open24:true}
+  ],
+  shelter:[
+    {id:'s1',n:"Mirpur Cyclone Shelter No. 1",a:"Mirpur-1, Dhaka-1216",p:"02-9001100",lat:23.7975,lng:90.3592,capacity:500},
+    {id:'s2',n:"Pallabi Community Relief Centre",a:"Pallabi, Dhaka",p:"02-9002200",lat:23.8236,lng:90.3595,capacity:300},
+    {id:'s3',n:"Kafrul Emergency Shelter",a:"Kafrul, Dhaka",p:"02-9003300",lat:23.8063,lng:90.3694,capacity:400},
+    {id:'s4',n:"Mohammadpur Relief Centre",a:"Mohammadpur, Dhaka-1205",p:"02-9004400",lat:23.7630,lng:90.3521,capacity:600},
+    {id:'s5',n:"Sher-e-Bangla Nagar Shelter",a:"Sher-e-Bangla Nagar",p:"02-9005500",lat:23.7730,lng:90.3669,capacity:800},
+    {id:'s6',n:"Uttara Emergency Relief Center",a:"Uttara, Sector-7, Dhaka",p:"02-9006600",lat:23.8758,lng:90.3951,capacity:350},
+    {id:'s7',n:"Tejgaon Industrial Shelter",a:"Tejgaon, Dhaka",p:"02-9007700",lat:23.7584,lng:90.3920,capacity:250}
+  ],
+  blood:[
+    {id:'d1',n:"Karim Uddin",bt:"O+",lat:23.7978,lng:90.3680,av:true,p:"01711000001"},
+    {id:'d2',n:"Rahim Hossain",bt:"A+",lat:23.7932,lng:90.3714,av:true,p:"01711000002"},
+    {id:'d3',n:"Nadia Islam",bt:"B+",lat:23.8014,lng:90.3621,av:false,p:"01711000003"},
+    {id:'d4',n:"Farhan Ahmed",bt:"AB+",lat:23.7892,lng:90.3803,av:true,p:"01711000004"},
+    {id:'d5',n:"Sumaiya Khatun",bt:"O-",lat:23.7952,lng:90.3753,av:true,p:"01711000005"},
+    {id:'d6',n:"Mosharaf Ali",bt:"A-",lat:23.8052,lng:90.3648,av:false,p:"01711000006"},
+    {id:'d7',n:"Tasnim Jahan",bt:"B-",lat:23.8082,lng:90.3831,av:true,p:"01711000007"},
+    {id:'d8',n:"Rafiqul Islam",bt:"AB-",lat:23.7908,lng:90.3798,av:true,p:"01711000008"},
+    {id:'d9',n:"Salma Begum",bt:"O+",lat:23.8025,lng:90.3672,av:true,p:"01711000009"},
+    {id:'d10',n:"Jubayer Hasan",bt:"A+",lat:23.7818,lng:90.3895,av:false,p:"01711000010"},
+    {id:'d11',n:"Rekha Roy",bt:"B+",lat:23.7963,lng:90.3745,av:true,p:"01711000011"},
+    {id:'d12',n:"Mizan Rahman",bt:"O+",lat:23.8043,lng:90.3656,av:true,p:"01711000012"},
+    {id:'d13',n:"Farhana Begum",bt:"A+",lat:23.7876,lng:90.3812,av:true,p:"01711000013"},
+    {id:'d14',n:"Dilruba Akter",bt:"O-",lat:23.7995,lng:90.3726,av:true,p:"01711000015"}
+  ]
+};
+
+const SVC_META={
+  hospital:{label:'Hospital',color:'#E53935',bg:'#FFEBEE',icon:'🏥',count:'45'},
+  pharmacy:{label:'Pharmacy',color:'#2E7D32',bg:'#E8F5E9',icon:'💊',count:'200+'},
+  fire:    {label:'Fire Station',color:'#E65100',bg:'#FFF3E0',icon:'🔥',count:'18'},
+  police:  {label:'Police Station',color:'#1565C0',bg:'#E3F2FD',icon:'👮',count:'50'},
+  shelter: {label:'Emergency Shelter',color:'#6A1B9A',bg:'#F3E5F5',icon:'🏠',count:'7'},
+  blood:   {label:'Blood Donor',color:'#C62828',bg:'#FFEBEE',icon:'🩸',count:'All types'},
+  news:    {label:'Disaster News',color:'#E65100',bg:'#FFFDE7',icon:'📡',count:'Live'}
+};
+
+const FALLBACK_NEWS=[
+  {title:"Flash flood warning issued for Sylhet and Sunamganj as water levels rise rapidly",description:"District administration activates emergency response teams. Residents in low-lying areas urged to evacuate.",source:{name:"The Daily Star"},publishedAt:"2025-01-01T10:00:00Z",urlToImage:null,url:"#",cat:"Flood",emoji:"🌊",catColor:"#1565C0"},
+  {title:"Magnitude 4.8 earthquake near Chittagong — no casualties reported",description:"USGS confirms tremor at 10km depth. Buildings inspected by civil engineers as precautionary measure.",source:{name:"Prothom Alo"},publishedAt:"2025-01-01T07:00:00Z",urlToImage:null,url:"#",cat:"Earthquake",emoji:"🌍",catColor:"#4E342E"},
+  {title:"Major warehouse fire in Banani brought under control after 4-hour battle",description:"16 fire tenders deployed. No fatalities. Investigation into cause underway by authorities.",source:{name:"Bangladesh Post"},publishedAt:"2025-01-01T04:00:00Z",urlToImage:null,url:"#",cat:"Fire",emoji:"🔥",catColor:"#E65100"},
+  {title:"Cyclone alert lifted for Cox's Bazar coast as storm weakens",description:"Bangladesh Meteorological Department confirms storm has weakened. Situation normalising.",source:{name:"BMD"},publishedAt:"2024-12-31T10:00:00Z",urlToImage:null,url:"#",cat:"Cyclone",emoji:"🌀",catColor:"#6A1B9A"},
+  {title:"BWDB monitoring Brahmaputra water levels amid seasonal flooding concern",description:"Water Development Board increases monitoring frequency at 12 key gauge stations.",source:{name:"UNB"},publishedAt:"2024-12-31T08:00:00Z",urlToImage:null,url:"#",cat:"Flood",emoji:"🌊",catColor:"#1565C0"},
+  {title:"Severe thunderstorm damages power infrastructure in Tangail district",description:"BPDB crews working to restore electricity to 40,000 affected households.",source:{name:"Dhaka Tribune"},publishedAt:"2024-12-30T14:00:00Z",urlToImage:null,url:"#",cat:"Storm",emoji:"⛈️",catColor:"#37474F"}
+];
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+let S={
+  dark: false,
+  userLat: 23.8041,
+  userLng: 90.3656,
+  locAddr: 'Kafrul, Mirpur, Dhaka (Default)',
+  locMode: 'default',   // 'gps' | 'manual' | 'default'
+  favorites: [],
+  currentView: 'home',
+  prevView: 'home',
+  activeService: null,
+  btFilter: 'All',
+  news: null,
+  watchId: null
+};
+
+// Load from storage
+try{
+  const saved=JSON.parse(localStorage.getItem('ef_state')||'{}');
+  if(saved.dark!=null) S.dark=saved.dark;
+  if(saved.favorites) S.favorites=saved.favorites;
+  if(saved.locAddr) S.locAddr=saved.locAddr;
+  if(saved.userLat) S.userLat=saved.userLat;
+  if(saved.userLng) S.userLng=saved.userLng;
+  if(saved.locMode) S.locMode=saved.locMode;
+}catch(e){}
+
+function persist(){
+  try{localStorage.setItem('ef_state',JSON.stringify({dark:S.dark,favorites:S.favorites,locAddr:S.locAddr,userLat:S.userLat,userLng:S.userLng,locMode:S.locMode}));}catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DISTANCE (Haversine)
+// ══════════════════════════════════════════════════════════════════
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function distTo(item){
+  return haversine(S.userLat,S.userLng,item.lat,item.lng);
+}
+
+function fmtDist(km){
+  return km<1?Math.round(km*1000)+'m':km.toFixed(1)+' km';
+}
+
+function sortedByDist(arr){
+  return [...arr].map(i=>({...i,_d:distTo(i)})).sort((a,b)=>a._d-b._d);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════════════════════════════════
+function applyDark(){
+  document.body.classList.toggle('dark',S.dark);
+  document.getElementById('moon-icon').style.display=S.dark?'none':'block';
+  document.getElementById('sun-icon').style.display=S.dark?'block':'none';
+}
+function toggleDark(){S.dark=!S.dark;applyDark();persist();haptic(30)}
+applyDark();
+
+// ══════════════════════════════════════════════════════════════════
+// HAPTIC
+// ══════════════════════════════════════════════════════════════════
+function haptic(p=80){if(navigator.vibrate)navigator.vibrate(p)}
+
+// ══════════════════════════════════════════════════════════════════
+// LOCATION
+// ══════════════════════════════════════════════════════════════════
+function updateLocBar(){
+  const dot=document.getElementById('loc-dot');
+  const label=document.getElementById('loc-label');
+  const addr=document.getElementById('loc-addr');
+  dot.className='loc-dot '+(S.locMode==='gps'?'gps':S.locMode==='manual'?'manual':'default');
+  label.textContent=S.locMode==='gps'?'GPS Location':S.locMode==='manual'?'Manual Location':'Default Location';
+  addr.textContent=S.locAddr;
+}
+
+function requestGPS(){
+  const btn=document.getElementById('gps-btn');
+  btn.innerHTML='<svg class="spin" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Detecting…';
+  if(!navigator.geolocation){alert('GPS not supported');btn.innerHTML='Use My GPS Location';return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    S.userLat=pos.coords.latitude;
+    S.userLng=pos.coords.longitude;
+    S.locAddr=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)} (GPS)`;
+    S.locMode='gps';
+    persist();updateLocBar();
+    const box=document.getElementById('loc-current-box');
+    const txt=document.getElementById('loc-current-text');
+    box.style.display='flex';
+    txt.textContent=S.locAddr;
+    btn.innerHTML='✅ GPS Location Set!';
+    setTimeout(()=>{
+      btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg> Use My GPS Location';
+      closeLocModal();
+      // Re-render if on service view
+      if(S.activeService) renderServiceList(S.activeService);
+    },1200);
+    // Start watching position
+    if(S.watchId) navigator.geolocation.clearWatch(S.watchId);
+    S.watchId=navigator.geolocation.watchPosition(p2=>{
+      S.userLat=p2.coords.latitude;
+      S.userLng=p2.coords.longitude;
+      S.locAddr=`${p2.coords.latitude.toFixed(5)}, ${p2.coords.longitude.toFixed(5)} (GPS Live)`;
+      updateLocBar();
+    },{enableHighAccuracy:true,timeout:10000,maximumAge:5000});
+  },err=>{
+    btn.innerHTML='❌ GPS Error — Try Manual';
+    S.locMode='default';
+  },{enableHighAccuracy:true,timeout:10000});
+}
+
+function setManualLocation(){
+  const val=document.getElementById('manual-input').value.trim();
+  if(!val)return;
+  // Map known areas to approximate coords for distance calculation
+  const knownAreas={
+    'gulshan':     {lat:23.7925,lng:90.4148},
+    'dhanmondi':   {lat:23.7461,lng:90.3742},
+    'mirpur':      {lat:23.8041,lng:90.3656},
+    'uttara':      {lat:23.8759,lng:90.3963},
+    'shahbagh':    {lat:23.7398,lng:90.3963},
+    'motijheel':   {lat:23.7286,lng:90.4194},
+    'mohammadpur': {lat:23.7644,lng:90.3568},
+    'tejgaon':     {lat:23.7612,lng:90.3945},
+    'banani':      {lat:23.7937,lng:90.4031},
+    'kafrul':      {lat:23.8072,lng:90.3648},
+    'rampura':     {lat:23.7560,lng:90.4350},
+    'bashundhara': {lat:23.8133,lng:90.4300},
+    'khilgaon':    {lat:23.7473,lng:90.4290},
+    'wari':        {lat:23.7198,lng:90.4143},
+    'lalbagh':     {lat:23.7210,lng:90.3880},
+  };
+  const lower=val.toLowerCase();
+  let found=false;
+  for(const [key,coords] of Object.entries(knownAreas)){
+    if(lower.includes(key)){
+      S.userLat=coords.lat;S.userLng=coords.lng;found=true;break;
+    }
+  }
+  if(!found){S.userLat=23.8041;S.userLng=90.3656;}
+  S.locAddr=val+' (Manual)';
+  S.locMode='manual';
+  persist();updateLocBar();
+  closeLocModal();
+  if(S.activeService) renderServiceList(S.activeService);
+}
+
+function checkManualInput(){
+  const v=document.getElementById('manual-input').value.trim();
+  const btn=document.getElementById('manual-submit');
+  btn.disabled=!v;
+}
+
+function openLocModal(){
+  document.getElementById('loc-modal').classList.add('open');
+  // Show current
+  const box=document.getElementById('loc-current-box');
+  const txt=document.getElementById('loc-current-text');
+  if(S.locMode!=='default'){box.style.display='flex';txt.textContent=S.locAddr;}
+}
+function closeLocModal(e){
+  if(!e||e.target===document.getElementById('loc-modal'))
+    document.getElementById('loc-modal').classList.remove('open');
+}
+function switchLocTab(t){
+  document.getElementById('ltab-gps').classList.toggle('on',t==='gps');
+  document.getElementById('ltab-manual').classList.toggle('on',t==='manual');
+  document.getElementById('loc-gps-panel').style.display=t==='gps'?'block':'none';
+  document.getElementById('loc-manual-panel').style.display=t==='manual'?'block':'none';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIEW ROUTING
+// ══════════════════════════════════════════════════════════════════
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  S.prevView=S.currentView;
+  S.currentView=name;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack(){showView(S.prevView||'home')}
+
+function setBottomNav(id){
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('bnav-'+id);
+  if(el) el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GOOGLE MAP MODAL
+// ══════════════════════════════════════════════════════════════════
+function openMapModal(item,type){
+  haptic(60);
+  const meta=SVC_META[type]||{};
+  document.getElementById('map-title').textContent=item.n;
+  document.getElementById('map-sub').textContent=item.a;
+  document.getElementById('map-call-link').href='tel:'+item.p;
+
+  // Google Maps directions URL
+  const dest=encodeURIComponent(`${item.lat},${item.lng}`);
+  const origin=encodeURIComponent(`${S.userLat},${S.userLng}`);
+  const mapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+  document.getElementById('map-gmaps-link').href=mapsUrl;
+
+  // Embed map using Google Static Maps (no API key needed for basic) or iframe
+  const wrap=document.getElementById('gmap-iframe-wrap');
+  const loading=document.getElementById('gmap-loading-text');
+  loading.textContent='Loading map…';
+
+  // Use OpenStreetMap via iframe (works without API key)
+  const osmUrl=`https://www.openstreetmap.org/export/embed.html?bbox=${item.lng-0.02},${item.lat-0.02},${item.lng+0.02},${item.lat+0.02}&layer=mapnik&marker=${item.lat},${item.lng}`;
+
+  const placeholder=document.getElementById('gmap-placeholder');
+  placeholder.innerHTML=`<div style="width:100%;height:350px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-radius:0">
+    <iframe src="${osmUrl}" style="width:100%;height:350px;border:none" loading="lazy" title="Map"></iframe>
+  </div>`;
+
+  document.getElementById('map-modal').classList.add('open');
+}
+
+function closeMapModal(e){
+  if(e.target===document.getElementById('map-modal'))
+    document.getElementById('map-modal').classList.remove('open');
+}
+function closeMapModalBtn(){document.getElementById('map-modal').classList.remove('open')}
+
+// ══════════════════════════════════════════════════════════════════
+// FAVORITES
+// ══════════════════════════════════════════════════════════════════
+function isFav(id){return S.favorites.some(f=>f.id===id)}
+function toggleFav(item,type){
+  haptic(30);
+  if(isFav(item.id)){
+    S.favorites=S.favorites.filter(f=>f.id!==item.id);
+  }else{
+    S.favorites.push({...item,_type:type});
+  }
+  persist();
+  updateFavDot();
+  // Update button state
+  const btn=document.getElementById('fav-'+item.id);
+  if(btn){
+    const svg=btn.querySelector('svg');
+    svg.style.fill=isFav(item.id)?'#E53935':'none';
+    svg.style.stroke=isFav(item.id)?'#E53935':'var(--text2)';
+  }
+}
+function updateFavDot(){
+  const dot=document.getElementById('fav-dot');
+  dot.style.display=S.favorites.length>0?'block':'none';
+}
+
+function renderFavorites(){
+  const el=document.getElementById('fav-content');
+  document.getElementById('fav-title').textContent=`Favorites (${S.favorites.length})`;
+  if(!S.favorites.length){
+    el.innerHTML=`<div class="fav-empty">
+      <div class="fav-empty-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+      <h3 style="font-family:var(--ffd);font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px">No favorites yet</h3>
+      <p style="color:var(--text2);font-size:14px;max-width:260px;margin:0 auto">Tap ❤️ on any service card to save it for quick access</p>
+      <button onclick="showView('home')" style="margin-top:20px;background:var(--blue2);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer">Browse Services</button>
+    </div>`;
+    return;
+  }
+  // Group by type
+  const grouped=S.favorites.reduce((acc,f)=>{
+    const k=f._type||'other';
+    if(!acc[k]) acc[k]=[];
+    acc[k].push(f);
+    return acc;
+  },{});
+  let html='';
+  for(const [type,items] of Object.entries(grouped)){
+    const meta=SVC_META[type]||{label:type,color:'#555',bg:'#eee'};
+    html+=`<div class="fav-section-head" style="color:${meta.color}">${meta.icon||'📍'} ${meta.label}</div>`;
+    html+='<div class="place-list" style="padding-top:0">';
+    const sorted=sortedByDist(items);
+    sorted.forEach((item,i)=>{
+      html+=buildPlaceCard(item,type,meta,i);
+    });
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SERVICE VIEWS
+// ══════════════════════════════════════════════════════════════════
+function openService(type){
+  S.activeService=type;
+  S.btFilter='All';
+  showView('service');
+  const meta=SVC_META[type]||{};
+  document.getElementById('svc-hdr-icon').innerHTML=`<span style="font-size:18px">${meta.icon||'📍'}</span>`;
+  document.getElementById('svc-hdr-icon').style.background=meta.bg||'#eee';
+  renderServiceList(type);
+}
+
+function renderServiceList(type){
+  const meta=SVC_META[type]||{};
+  const btBar=document.getElementById('bt-bar');
+  const listEl=document.getElementById('svc-list');
+  const countEl=document.getElementById('svc-hdr-count');
+
+  // Blood type filter
+  if(type==='blood'){
+    btBar.classList.remove('hide');
+    renderBtBar(S.btFilter);
+  }else{
+    btBar.classList.add('hide');
+  }
+
+  // Show skeletons
+  listEl.innerHTML='<div class="place-list">'+Array(4).fill(`
+    <div class="skel-card">
+      <div style="display:flex;gap:12px">
+        <div class="skeleton" style="width:34px;height:34px;border-radius:10px;flex-shrink:0"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div class="skeleton" style="height:15px;width:65%"></div>
+          <div class="skeleton" style="height:12px;width:100%"></div>
+          <div class="skeleton" style="height:12px;width:45%"></div>
+        </div>
+        <div class="skeleton" style="width:55px;height:28px;border-radius:9px;flex-shrink:0"></div>
+      </div>
+    </div>`).join('')+'</div>';
+
+  setTimeout(()=>{
+    if(type==='blood'){
+      let items=sortedByDist(DATA.blood);
+      if(S.btFilter!=='All') items=items.filter(d=>d.bt===S.btFilter);
+      countEl.textContent=`${items.length} donors${S.btFilter!=='All'?' · '+S.btFilter:''}`;
+      listEl.innerHTML='<div class="place-list">'+items.map((d,i)=>buildDonorCard(d,i)).join('')+'</div>';
+    }else if(type==='news'){
+      showView('news');loadNews();return;
+    }else{
+      const items=sortedByDist(DATA[type]||[]);
+      countEl.textContent=`${items.length} results · by distance`;
+      document.getElementById('svc-hdr-title').textContent=meta.label||type;
+      listEl.innerHTML='<div class="place-list">'+items.map((item,i)=>buildPlaceCard(item,type,meta,i)).join('')+'</div>';
+    }
+    // Stagger animations
+    document.querySelectorAll('.place-card').forEach((c,i)=>{c.style.animationDelay=(i*50)+'ms'});
+    document.querySelectorAll('.donor-card').forEach((c,i)=>{c.style.animationDelay=(i*50)+'ms'});
+  },600);
+}
+
+function renderBtBar(active){
+  const el=document.getElementById('bt-bar');
+  const types=['All','A+','A-','B+','B-','O+','O-','AB+','AB-'];
+  el.innerHTML=types.map(t=>`<button class="bt-chip${t===active?' on':''}" onclick="setBtFilter('${t}')">${t}</button>`).join('');
+}
+
+function setBtFilter(bt){haptic(30);S.btFilter=bt;renderBtBar(bt);renderServiceList('blood')}
+
+function refreshSvc(){
+  haptic(50);
+  const icon=document.getElementById('refresh-icon');
+  icon.style.animation='spinAnim .8s linear infinite';
+  renderServiceList(S.activeService);
+  setTimeout(()=>icon.style.animation='',900);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CARD BUILDERS
+// ══════════════════════════════════════════════════════════════════
+const TYPE_CLASS={Government:'t-gov',Private:'t-pvt','Semi-Govt':'t-smi',HQ:'t-hq','Main Station':'t-mn','Zone Station':'t-zn'};
+
+
+// Global item registry — safe onclick data passing
+if(!window._R)window._R={};
+function _reg(item,type){window._R[item.id]={...item,_type:type};}
+
+function buildPlaceCard(item,type,meta,idx){
+  _reg(item,type);
+  const km=haversine(S.userLat,S.userLng,item.lat,item.lng);
+  const fav=isFav(item.id);
+  const tc=TYPE_CLASS[item.t]||'t-gov';
+  const delay=idx*50;
+  const tags=[];
+  if(item.ambulance) tags.push('<span class="pc-tag" style="background:var(--green3);color:var(--green)">🚑 Ambulance</span>');
+  if(item.open24) tags.push('<span class="pc-tag" style="background:var(--blue3);color:var(--blue)">⏰ 24/7 Open</span>');
+  if(item.capacity) tags.push(`<span class="pc-tag" style="background:var(--purple3);color:var(--purple)">Cap: ${item.capacity}</span>`);
+  return`<div class="place-card" style="animation-delay:${delay}ms">
+    <div class="place-card-bar" style="background:${meta.color}"></div>
+    <div class="pc-top">
+      <div class="pc-num" style="background:${meta.color}18;color:${meta.color}">${idx+1}</div>
+      <div class="pc-info">
+        <div class="pc-name">${item.n}</div>
+        ${item.t?`<span class="pc-type ${tc}">${item.t}</span>`:''}
+        <div class="pc-addr"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>${item.a}</div>
+        <div class="pc-phone" style="color:${meta.color}"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>${item.p}</div>
+        ${tags.length?`<div class="pc-tags">${tags.join('')}</div>`:''}
+      </div>
+      <div class="pc-dist">
+        <div class="dist-badge" style="background:${meta.color}18;color:${meta.color}">${fmtDist(km)}</div>
+        <div class="live-dist">
+          <div class="dist-live-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3"/></svg>Live GPS</div>
+        </div>
+        <button id="fav-${item.id}" class="fav-btn" onclick="event.stopPropagation();toggleFav(window._R&&window._R['${item.id}'],'${type}')" >
+          <svg viewBox="0 0 24 24" fill="${fav?'#E53935':'none'}" stroke="${fav?'#E53935':'var(--text2)'}" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="pc-actions">
+      <a href="tel:${item.p}" class="btn-call" style="background:${meta.color}18;color:${meta.color}" onclick="haptic([100,50,200])">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        Call
+      </a>
+      <button class="btn-dir" style="background:${meta.color}" onclick="openMapModal(window._R&&window._R['${item.id}'],'${type}');haptic(60)" >
+        <svg viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 00-1.42 0l-9 9a1 1 0 000 1.42l9 9a1 1 0 001.42 0l9-9a1 1 0 000-1.42zM14 14.5V12h-4v3H8v-4a1 1 0 011-1h5V7.5l3.5 3.5-3.5 3.5z"/></svg>
+        Map & Directions
+      </button>
+    </div>
+  </div>`;
+}
+
+function buildDonorCard(d,idx){
+  const km=haversine(S.userLat,S.userLng,d.lat,d.lng);
+  const delay=idx*50;
+  return`<div class="donor-card" style="animation-delay:${delay}ms">
+    <div class="donor-type" style="background:${d.av?'#C62828':'#9E9E9E'}">${d.bt}</div>
+    <div style="flex:1">
+      <div class="donor-name">${d.n}</div>
+      <div class="donor-km">${fmtDist(km)} away</div>
+      <span class="avail-tag ${d.av?'avail-yes':'avail-no'}">${d.av?'✓ Available':'✗ Unavailable'}</span>
+      ${d.av?`<div style="margin-top:10px"><a href="tel:${d.p}" onclick="haptic([100,50,200])" style="background:#C62828;color:#fff;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg> Contact Donor</a></div>`:''}
+    </div>
+    <div class="dist-badge" style="background:#FFEBEE;color:#C62828;flex-shrink:0">${fmtDist(km)}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NEWS (Real fetch from NewsAPI via proxy + fallback)
+// ══════════════════════════════════════════════════════════════════
+let newsCache=null;
+
+async function loadNews(){
+  const grid=document.getElementById('news-grid');
+  if(!grid)return;
+
+  if(newsCache){renderNews(newsCache,grid);return;}
+
+  grid.innerHTML=`<div class="news-loading" style="grid-column:1/-1">
+    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    <div>Loading latest disaster news…</div>
+  </div>`;
+
+  // ── NEWS: Replace 'YOUR_NEWSAPI_KEY' with your key from newsapi.org (free) ──
+  const _nk='YOUR_NEWSAPI_KEY';
+  if(_nk&&_nk!=='YOUR_NEWSAPI_KEY'){
+    try{
+      const _r=await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent('bangladesh flood cyclone earthquake fire storm')}&language=en&sortBy=publishedAt&pageSize=9&apiKey=${_nk}`,{signal:AbortSignal.timeout(8000)});
+      if(_r.ok){const _d=await _r.json();if(_d.articles&&_d.articles.length){newsCache=_d.articles.map(a=>({...a,cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))}));renderNews(newsCache,grid);return;}}
+    }catch(e){}
+  }
+  // Fallback: built-in demo news
+  newsCache=FALLBACK_NEWS;
+  renderNews(newsCache,grid);
+}
+
+function detectCat(title=''){
+  const t=title.toLowerCase();
+  if(t.includes('flood')||t.includes('water')) return 'Flood';
+  if(t.includes('earthquake')||t.includes('tremor')) return 'Earthquake';
+  if(t.includes('fire')||t.includes('blaze')) return 'Fire';
+  if(t.includes('cyclone')||t.includes('storm')||t.includes('typhoon')) return 'Storm';
+  if(t.includes('landslide')) return 'Landslide';
+  return 'Disaster';
+}
+function catEmoji(c){return{Flood:'🌊',Earthquake:'🌍',Fire:'🔥',Storm:'⛈️',Cyclone:'🌀',Landslide:'⛰️',Disaster:'⚠️'}[c]||'📰'}
+function catColor(c){return{Flood:'#1565C0',Earthquake:'#4E342E',Fire:'#E65100',Storm:'#37474F',Cyclone:'#6A1B9A',Landslide:'#5D4037',Disaster:'#E53935'}[c]||'#555'}
+
+function timeAgo(d){
+  const diff=(Date.now()-new Date(d).getTime())/1000;
+  if(diff<3600) return Math.round(diff/60)+' min ago';
+  if(diff<86400) return Math.round(diff/3600)+' hrs ago';
+  return Math.round(diff/86400)+' days ago';
+}
+
+function renderNews(articles,grid){
+  if(!grid)return;
+  grid.innerHTML=articles.slice(0,9).map((a,i)=>{
+    const cat=a.cat||detectCat(a.title||'');
+    const emoji=a.emoji||catEmoji(cat);
+    const color=a.catColor||catColor(cat);
+    const hasImg=a.urlToImage&&!a.urlToImage.includes('removed');
+    const delay=i*60;
+    return`<a href="${a.url||'#'}" target="_blank" rel="noopener" class="news-card" style="animation-delay:${delay}ms">
+      <div class="news-img-wrap">
+        ${hasImg
+          ?`<img src="${a.urlToImage}" alt="${(a.title||'').substring(0,50)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=news-fallback>${emoji}</div>'">`
+          :`<div class="news-fallback">${emoji}</div>`}
+        <div class="news-cat" style="background:${color}">${cat}</div>
+      </div>
+      <div class="news-body">
+        <div class="news-source">${(a.source&&a.source.name)||'News'}</div>
+        <div class="news-title">${(a.title||'').replace(/\s*-\s*[\w\s]+$/,'')}</div>
+        <div class="news-desc">${a.description||a.content||''}</div>
+        <div class="news-foot">
+          <div class="news-time"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>${timeAgo(a.publishedAt)}</div>
+          <span class="news-link">Read →</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HOME SCREEN CONTENT
+// ══════════════════════════════════════════════════════════════════
+function renderServiceCards(){
+  const grid=document.getElementById('srv-grid');
+  const services=[
+    {id:'hospital'},{id:'pharmacy'},{id:'fire'},{id:'police'},
+    {id:'shelter'},{id:'blood'},{id:'news'}
+  ];
+  grid.innerHTML=services.map(({id},i)=>{
+    const m=SVC_META[id];
+    const delay=i*60;
+    return`<div class="srv-card" style="animation-delay:${delay}ms" onclick="${id==='news'?"showView('news');loadNews();setBottomNav('news')":`openService('${id}')`}" role="button" tabindex="0">
+      <div class="srv-card-top" style="background:${m.color}"></div>
+      <div class="srv-card-icon" style="background:${m.bg}"><span style="font-size:26px">${m.icon}</span></div>
+      <div class="srv-card-name" style="color:${m.color}">${m.label}</div>
+      <div class="srv-card-count">${m.count}</div>
+      <div class="srv-card-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>`;
+  }).join('');
+  // Trigger stagger
+  setTimeout(()=>{
+    document.querySelectorAll('.srv-card').forEach((c,i)=>{
+      setTimeout(()=>c.classList.add('appeared'),i*60);
+    });
+  },100);
+}
+
+function renderHomeNewsPreview(){
+  const el=document.getElementById('home-news-preview');
+  if(!el)return;
+  const items=FALLBACK_NEWS.slice(0,2);
+  el.innerHTML=items.map(a=>{
+    const hasImg=a.urlToImage&&!a.urlToImage.includes('removed');
+    return`<a href="${a.url||'#'}" target="_blank" rel="noopener" class="news-card">
+      <div class="news-img-wrap" style="height:130px">
+        ${hasImg?`<img src="${a.urlToImage}" loading="lazy">`:`<div class="news-fallback" style="font-size:52px">${a.emoji}</div>`}
+        <div class="news-cat" style="background:${a.catColor||'#555'}">${a.cat}</div>
+      </div>
+      <div class="news-body">
+        <div class="news-source">${a.source.name}</div>
+        <div class="news-title" style="font-size:14px">${a.title}</div>
+        <div class="news-time"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>${a.time||'Recent'}</div>
+      </div>
+    </a>`;
+  }).join('');
+  // Load real news in background and update
+  setTimeout(async()=>{
+    await loadNews();
+    if(newsCache&&newsCache.length){
+      const previewItems=newsCache.slice(0,2);
+      el.innerHTML=previewItems.map(a=>{
+        const cat=a.cat||detectCat(a.title||'');
+        const hasImg=a.urlToImage&&!a.urlToImage.includes('removed');
+        return`<a href="${a.url||'#'}" target="_blank" rel="noopener" class="news-card">
+          <div class="news-img-wrap" style="height:130px">
+            ${hasImg?`<img src="${a.urlToImage}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=news-fallback style=font-size:52px>${a.emoji||'📰'}</div>'">`:`<div class="news-fallback" style="font-size:52px">${a.emoji||catEmoji(cat)}</div>`}
+            <div class="news-cat" style="background:${a.catColor||catColor(cat)}">${cat}</div>
+          </div>
+          <div class="news-body">
+            <div class="news-source">${(a.source&&a.source.name)||'News'}</div>
+            <div class="news-title" style="font-size:14px">${(a.title||'').replace(/\s*-\s*[\w\s]+$/,'')}</div>
+            <div class="news-time"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>${timeAgo(a.publishedAt)}</div>
+          </div>
+        </a>`;
+      }).join('');
+    }
+  },500);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════════════
+let searchTimer=null;
+function doSearch(q){
+  clearTimeout(searchTimer);
+  const results=document.getElementById('search-results');
+  if(!q.trim()){results.classList.remove('open');return;}
+  searchTimer=setTimeout(()=>{
+    const lower=q.toLowerCase();
+    const hits=[];
+    const types=['hospital','fire','police','pharmacy','shelter'];
+    for(const type of types){
+      const meta=SVC_META[type];
+      for(const item of (DATA[type]||[])){
+        if(item.n.toLowerCase().includes(lower)||item.a.toLowerCase().includes(lower)){
+          const km=haversine(S.userLat,S.userLng,item.lat,item.lng);
+          hits.push({item,type,meta,km});
+        }
+      }
+    }
+    // Blood donors
+    for(const d of DATA.blood){
+      if(d.n.toLowerCase().includes(lower)||d.bt.toLowerCase().includes(lower)){
+        const km=haversine(S.userLat,S.userLng,d.lat,d.lng);
+        hits.push({item:d,type:'blood',meta:SVC_META.blood,km});
+      }
+    }
+    hits.sort((a,b)=>a.km-b.km);
+    if(!hits.length){
+      results.innerHTML=`<div class="search-empty">No results for "${q}"</div>`;
+    }else{
+      results.innerHTML=hits.slice(0,8).map(h=>`
+        <div class="search-result-item" onclick="openSearchResult('${h.item.id}','${h.type}')">
+          <div class="sr-icon" style="background:${h.meta.bg}">${h.meta.icon}</div>
+          <div>
+            <div class="sr-name">${h.item.n}</div>
+            <div class="sr-meta">${h.item.a||h.item.bt||''}</div>
+          </div>
+          <div class="sr-km" style="color:${h.meta.color}">${fmtDist(h.km)}</div>
+        </div>`).join('');
+    }
+    results.classList.add('open');
+  },250);
+}
+
+function openSearchResult(id,type){
+  clearSearch();
+  openService(type);
+  // After render, scroll to item
+  setTimeout(()=>{
+    const el=document.getElementById('fav-'+id);
+    if(el) el.closest('.place-card,.donor-card')?.scrollIntoView({behavior:'smooth',block:'center'});
+  },800);
+}
+
+function clearSearch(){
+  const _si=document.getElementById('search-input');
+  _si.value='';
+  document.getElementById('search-results').classList.remove('open');
+  document.getElementById('search-clear-btn').classList.remove('visible');
+}
+
+// Close search on outside click
+document.addEventListener('click',e=>{
+  if(!document.getElementById('search-wrap').contains(e.target))
+    document.getElementById('search-results').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════════════════════
+// OFFLINE
+// ══════════════════════════════════════════════════════════════════
+function updateOnline(){
+  const strip=document.getElementById('offline-strip');
+  if(!navigator.onLine){strip.textContent='📵 No internet — showing cached data';strip.className='show';}
+  else{strip.textContent='✅ Back online!';strip.className='show online-strip';setTimeout(()=>strip.className='',3000);}
+}
+window.addEventListener('offline',updateOnline);
+window.addEventListener('online',updateOnline);
+
+// ══════════════════════════════════════════════════════════════════
+// GPS LIVE UPDATE (every 10s when on service view)
+// ══════════════════════════════════════════════════════════════════
+setInterval(()=>{
+  if(S.locMode==='gps'&&S.activeService&&S.currentView==='service'){
+    // Re-calc distances without full re-render (update badges only)
+    document.querySelectorAll('[id^="dist-live-"]').forEach(el=>{
+      const id=el.dataset.id;
+      const item=[...Object.values(DATA)].flat().find(i=>i.id===id);
+      if(item) el.textContent=fmtDist(haversine(S.userLat,S.userLng,item.lat,item.lng));
+    });
+  }
+},10000);
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+function init(){
+  updateLocBar();
+  renderServiceCards();
+  renderHomeNewsPreview();
+  updateFavDot();
+
+  // Auto GPS on load
+  if(S.locMode!=='manual'){
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos=>{
+        S.userLat=pos.coords.latitude;
+        S.userLng=pos.coords.longitude;
+        S.locAddr=`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS)`;
+        S.locMode='gps';
+        persist();updateLocBar();
+        // Re-render if needed
+        if(S.activeService) renderServiceList(S.activeService);
+        // Start watch
+        if(S.watchId) navigator.geolocation.clearWatch(S.watchId);
+        S.watchId=navigator.geolocation.watchPosition(p2=>{
+          S.userLat=p2.coords.latitude;
+          S.userLng=p2.coords.longitude;
+          S.locAddr=`${p2.coords.latitude.toFixed(4)}, ${p2.coords.longitude.toFixed(4)} (GPS)`;
+          updateLocBar();
+        },{enableHighAccuracy:true,timeout:10000,maximumAge:5000});
+      },()=>{
+        // GPS denied — keep default
+      },{enableHighAccuracy:true,timeout:8000});
+    }
+  }
+}
+
+// Show app after splash
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    document.getElementById('app').classList.add('ready');
+    setTimeout(()=>document.getElementById('splash').remove(),600);
+    init();
+  },1400);
+});
+</script>
+</body>
+</html>
