@@ -152,7 +152,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 }
 
 /* ── LOCATION BAR ──────────────────────────────────────────────────────── */
-#loc-bar{background:var(--surface);border-bottom:1px solid var(--border)}
+/* Show only on service/news/favorites views; home uses hero-loc-row instead */
+#loc-bar{background:var(--surface);border-bottom:1px solid var(--border);display:none}
+#loc-bar.show{display:block}
 .loc-inner{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
 .loc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:locPulse 2s ease-in-out infinite}
 @keyframes locPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
@@ -403,6 +405,11 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 .loc-manual-input{width:100%;padding:13px 16px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;font-size:14px;font-family:var(--ff);color:var(--text);outline:none;transition:all .2s;margin-bottom:10px}
 .loc-manual-input:focus{border-color:var(--blue2);background:var(--surface)}
 .loc-hint{font-size:12px;color:var(--text3);background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:16px}
+.loc-suggestion{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s}
+.loc-suggestion:last-child{border-bottom:none}
+.loc-suggestion:hover,.loc-suggestion.sel{background:var(--blue3)}
+.loc-suggestion-name{font-size:14px;font-weight:600;color:var(--text)}
+.loc-suggestion-area{font-size:12px;color:var(--text3);margin-top:1px}
 .loc-submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:var(--ff);cursor:pointer;transition:all .15s}
 .loc-submit-btn:hover{background:var(--red2)}
 .loc-submit-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -835,8 +842,12 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
         </button>
       </div>
       <div id="loc-manual-panel" style="display:none">
-        <input class="loc-manual-input" id="manual-input" type="text" placeholder="e.g. Mirpur-10, Dhaka" oninput="checkManualInput()">
-        <div class="loc-hint">💡 Try: Gulshan-2, Dhanmondi, Shahbagh, Uttara Sector-7…</div>
+        <div style="position:relative">
+          <svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="var(--text3)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <input class="loc-manual-input" id="manual-input" type="text" placeholder="Type area name (e.g. Mirpur, Gulshan…)" autocomplete="off" oninput="onManualInput(this.value)" style="padding-left:40px">
+          <div id="loc-suggestions" style="position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);box-shadow:var(--shadow3);z-index:300;max-height:220px;overflow-y:auto;display:none;margin-top:4px"></div>
+        </div>
+        <div class="loc-hint" style="margin-top:10px">💡 Popular: Mirpur, Gulshan, Dhanmondi, Uttara, Shahbagh, Banani, Motijheel…</div>
         <button class="loc-submit-btn" id="manual-submit" onclick="setManualLocation()" disabled>Set This Location</button>
       </div>
     </div>
@@ -1143,7 +1154,10 @@ function distTo(item){
 }
 
 function fmtDist(km){
-  return km<1?Math.round(km*1000)+'m':km.toFixed(1)+' km';
+  if(km<0.1) return Math.round(km*1000)+'m';
+  if(km<1)   return Math.round(km*1000)+'m';
+  if(km<10)  return km.toFixed(2)+' km';
+  return km.toFixed(1)+' km';
 }
 
 function sortedByDist(arr){
@@ -1266,37 +1280,171 @@ function getNearestAreaName(lat,lng){
   return best.n;
 }
 
+// ── Comprehensive Dhaka area suggestions ──────────────────────────────────
+const DHAKA_AREAS=[
+  {n:'Mirpur-1',area:'Mirpur, Dhaka',lat:23.7989,lng:90.3660},
+  {n:'Mirpur-2',area:'Mirpur, Dhaka',lat:23.7998,lng:90.3602},
+  {n:'Mirpur-10',area:'Mirpur, Dhaka',lat:23.8085,lng:90.3571},
+  {n:'Mirpur-11',area:'Mirpur, Dhaka',lat:23.8156,lng:90.3580},
+  {n:'Mirpur-12',area:'Mirpur, Dhaka',lat:23.8196,lng:90.3611},
+  {n:'Kafrul',area:'Mirpur, Dhaka',lat:23.8072,lng:90.3648},
+  {n:'Pallabi',area:'Mirpur, Dhaka',lat:23.8243,lng:90.3626},
+  {n:'Shah Ali',area:'Mirpur, Dhaka',lat:23.8154,lng:90.3522},
+  {n:'Shewrapara',area:'Mirpur, Dhaka',lat:23.7940,lng:90.3599},
+  {n:'Pirerbagh',area:'Mirpur, Dhaka',lat:23.7961,lng:90.3570},
+  {n:'Gulshan-1',area:'Gulshan, Dhaka',lat:23.7811,lng:90.4143},
+  {n:'Gulshan-2',area:'Gulshan, Dhaka',lat:23.7926,lng:90.4148},
+  {n:'Banani',area:'Dhaka',lat:23.7937,lng:90.4031},
+  {n:'Baridhara',area:'Dhaka',lat:23.8063,lng:90.4236},
+  {n:'Badda',area:'Dhaka',lat:23.7838,lng:90.4289},
+  {n:'Bashundhara',area:'Dhaka',lat:23.8133,lng:90.4300},
+  {n:'Uttara Sector-1',area:'Uttara, Dhaka',lat:23.8595,lng:90.3980},
+  {n:'Uttara Sector-3',area:'Uttara, Dhaka',lat:23.8730,lng:90.3994},
+  {n:'Uttara Sector-6',area:'Uttara, Dhaka',lat:23.8760,lng:90.3900},
+  {n:'Uttara Sector-7',area:'Uttara, Dhaka',lat:23.8710,lng:90.3870},
+  {n:'Uttara Sector-10',area:'Uttara, Dhaka',lat:23.8640,lng:90.3910},
+  {n:'Abdullahpur',area:'Uttara, Dhaka',lat:23.8859,lng:90.3924},
+  {n:'Dhanmondi',area:'Dhaka',lat:23.7470,lng:90.3752},
+  {n:'Dhanmondi-27',area:'Dhanmondi, Dhaka',lat:23.7436,lng:90.3713},
+  {n:'Mohammadpur',area:'Dhaka',lat:23.7639,lng:90.3571},
+  {n:'Shyamoli',area:'Dhaka',lat:23.7728,lng:90.3567},
+  {n:'Adabar',area:'Dhaka',lat:23.7726,lng:90.3487},
+  {n:'Kallyanpur',area:'Dhaka',lat:23.7786,lng:90.3568},
+  {n:'Shahbagh',area:'Dhaka',lat:23.7399,lng:90.3963},
+  {n:'Farmgate',area:'Dhaka',lat:23.7575,lng:90.3886},
+  {n:'Karwan Bazar',area:'Dhaka',lat:23.7519,lng:90.3924},
+  {n:'Tejgaon',area:'Dhaka',lat:23.7612,lng:90.3945},
+  {n:'Tejgaon Industrial',area:'Dhaka',lat:23.7643,lng:90.4073},
+  {n:'Motijheel',area:'Dhaka',lat:23.7282,lng:90.4199},
+  {n:'Paltan',area:'Dhaka',lat:23.7332,lng:90.4145},
+  {n:'Purana Paltan',area:'Dhaka',lat:23.7303,lng:90.4119},
+  {n:'Rampura',area:'Dhaka',lat:23.7560,lng:90.4350},
+  {n:'Malibagh',area:'Dhaka',lat:23.7463,lng:90.4162},
+  {n:'Khilgaon',area:'Dhaka',lat:23.7479,lng:90.4292},
+  {n:'Sabujbagh',area:'Dhaka',lat:23.7356,lng:90.4418},
+  {n:'Khilkhet',area:'Dhaka',lat:23.8320,lng:90.4143},
+  {n:'Vatara',area:'Dhaka',lat:23.8142,lng:90.4232},
+  {n:'Niketan',area:'Dhaka',lat:23.7720,lng:90.4080},
+  {n:'Wari',area:'Old Dhaka',lat:23.7198,lng:90.4143},
+  {n:'Lalbagh',area:'Old Dhaka',lat:23.7208,lng:90.3884},
+  {n:'Kotwali',area:'Old Dhaka',lat:23.7193,lng:90.4053},
+  {n:'Chawkbazar',area:'Old Dhaka',lat:23.7178,lng:90.3975},
+  {n:'Sutrapur',area:'Old Dhaka',lat:23.7186,lng:90.4148},
+  {n:'Bangshal',area:'Old Dhaka',lat:23.7213,lng:90.4039},
+  {n:'Hazaribagh',area:'Dhaka',lat:23.7260,lng:90.3764},
+  {n:'Jatrabari',area:'Dhaka',lat:23.7082,lng:90.4368},
+  {n:'Demra',area:'Dhaka',lat:23.7030,lng:90.4593},
+  {n:'Keraniganj',area:'Dhaka',lat:23.6862,lng:90.3820},
+  {n:'New Market',area:'Dhaka',lat:23.7337,lng:90.3866},
+  {n:'Azimpur',area:'Dhaka',lat:23.7279,lng:90.3861},
+  {n:'Elephant Road',area:'Dhaka',lat:23.7378,lng:90.3906},
+  {n:'Eskaton',area:'Dhaka',lat:23.7387,lng:90.4003},
+  {n:'Kakrail',area:'Dhaka',lat:23.7372,lng:90.4035},
+  {n:'Siddhirganj',area:'Narayanganj',lat:23.7253,lng:90.4028},
+  {n:'Narayanganj Sadar',area:'Narayanganj',lat:23.6231,lng:90.4997},
+  {n:'Rupganj',area:'Narayanganj',lat:23.7438,lng:90.5108},
+  {n:'Savar',area:'Savar, Dhaka',lat:23.8576,lng:90.2669},
+  {n:'Ashulia',area:'Savar, Dhaka',lat:23.8792,lng:90.3040},
+  {n:'Tongi',area:'Gazipur',lat:23.8984,lng:90.3997},
+  {n:'Gazipur Sadar',area:'Gazipur',lat:23.9999,lng:90.4148},
+  {n:'Mohakhali',area:'Dhaka',lat:23.7787,lng:90.4015},
+  {n:'Nakhalpara',area:'Dhaka',lat:23.7790,lng:90.4068},
+  {n:'Sher-e-Bangla Nagar',area:'Dhaka',lat:23.7728,lng:90.3676},
+  {n:'Agargaon',area:'Dhaka',lat:23.7776,lng:90.3746},
+  {n:'Sheorapara',area:'Mirpur, Dhaka',lat:23.7940,lng:90.3599},
+  {n:'Beribadh',area:'Mirpur, Dhaka',lat:23.8200,lng:90.3560},
+  {n:'Rupnagar',area:'Mirpur, Dhaka',lat:23.8198,lng:90.3593},
+  {n:'Darussalam',area:'Mirpur, Dhaka',lat:23.7958,lng:90.3518},
+  {n:'Vashantek',area:'Mirpur, Dhaka',lat:23.8307,lng:90.3571},
+];
+
+let _manualSelectedLat=null, _manualSelectedLng=null, _suggestTimer=null;
+
+function onManualInput(val){
+  clearTimeout(_suggestTimer);
+  _manualSelectedLat=null; _manualSelectedLng=null;
+  document.getElementById('manual-submit').disabled=true;
+  const sug=document.getElementById('loc-suggestions');
+  if(!val.trim()){sug.style.display='none';return;}
+  _suggestTimer=setTimeout(()=>{
+    const lower=val.toLowerCase();
+    // Local matches first
+    const local=DHAKA_AREAS.filter(a=>
+      a.n.toLowerCase().includes(lower)||a.area.toLowerCase().includes(lower)
+    ).slice(0,6);
+    const html=local.map((a,i)=>`
+      <div class="loc-suggestion${i===0?' sel':''}" onclick="selectSuggestion('${a.n}','${a.area}',${a.lat},${a.lng})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--blue2)" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        <div>
+          <div class="loc-suggestion-name">${a.n}</div>
+          <div class="loc-suggestion-area">${a.area}</div>
+        </div>
+      </div>`).join('');
+    if(html){
+      sug.innerHTML=html;
+      sug.style.display='block';
+    } else {
+      // Try Nominatim for unknown areas
+      sug.innerHTML='<div class="loc-suggestion" style="cursor:default;color:var(--text3);font-size:13px;padding:12px 14px">🔍 Searching…</div>';
+      sug.style.display='block';
+      fetchNominatimSuggestions(val,sug);
+    }
+    // Enable submit if typed text has value (fallback)
+    document.getElementById('manual-submit').disabled=!val.trim();
+  },300);
+}
+
+async function fetchNominatimSuggestions(q,sug){
+  try{
+    const url=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Dhaka, Bangladesh')}&format=json&limit=5&addressdetails=1&accept-language=en`;
+    const r=await fetch(url,{headers:{'Accept-Language':'en-US,en'},signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      const results=await r.json();
+      if(results.length){
+        sug.innerHTML=results.map(res=>{
+          const addr=res.address||{};
+          const name=addr.neighbourhood||addr.suburb||addr.city_district||addr.town||res.display_name.split(',')[0];
+          const area=[addr.city||addr.county,addr.state].filter(Boolean).join(', ');
+          const lat=parseFloat(res.lat);const lng=parseFloat(res.lon);
+          return`<div class="loc-suggestion" onclick="selectSuggestion('${name.replace(/'/g,"\'")}','${area.replace(/'/g,"\'")}',${lat},${lng})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--blue2)" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            <div>
+              <div class="loc-suggestion-name">${name}</div>
+              <div class="loc-suggestion-area">${area||'Bangladesh'}</div>
+            </div>
+          </div>`;
+        }).join('');
+      } else {
+        sug.innerHTML='<div style="padding:12px 14px;font-size:13px;color:var(--text3)">No results found. Try a different name.</div>';
+      }
+    }
+  }catch(e){sug.style.display='none';}
+}
+
+function selectSuggestion(name,area,lat,lng){
+  _manualSelectedLat=lat; _manualSelectedLng=lng;
+  const inp=document.getElementById('manual-input');
+  inp.value=name+(area?', '+area:'');
+  document.getElementById('loc-suggestions').style.display='none';
+  document.getElementById('manual-submit').disabled=false;
+}
+
 function setManualLocation(){
   const val=document.getElementById('manual-input').value.trim();
   if(!val)return;
-  // Map known areas to approximate coords for distance calculation
-  const knownAreas={
-    'gulshan':     {lat:23.7925,lng:90.4148},
-    'dhanmondi':   {lat:23.7461,lng:90.3742},
-    'mirpur':      {lat:23.8041,lng:90.3656},
-    'uttara':      {lat:23.8759,lng:90.3963},
-    'shahbagh':    {lat:23.7398,lng:90.3963},
-    'motijheel':   {lat:23.7286,lng:90.4194},
-    'mohammadpur': {lat:23.7644,lng:90.3568},
-    'tejgaon':     {lat:23.7612,lng:90.3945},
-    'banani':      {lat:23.7937,lng:90.4031},
-    'kafrul':      {lat:23.8072,lng:90.3648},
-    'rampura':     {lat:23.7560,lng:90.4350},
-    'bashundhara': {lat:23.8133,lng:90.4300},
-    'khilgaon':    {lat:23.7473,lng:90.4290},
-    'wari':        {lat:23.7198,lng:90.4143},
-    'lalbagh':     {lat:23.7210,lng:90.3880},
-  };
-  const lower=val.toLowerCase();
-  let found=false;
-  for(const [key,coords] of Object.entries(knownAreas)){
-    if(lower.includes(key)){
-      S.userLat=coords.lat;S.userLng=coords.lng;found=true;break;
-    }
+  if(_manualSelectedLat!==null){
+    S.userLat=_manualSelectedLat;
+    S.userLng=_manualSelectedLng;
+  } else {
+    // fallback text match
+    const lower=val.toLowerCase();
+    const match=DHAKA_AREAS.find(a=>lower.includes(a.n.toLowerCase())||a.n.toLowerCase().includes(lower));
+    if(match){S.userLat=match.lat;S.userLng=match.lng;}
+    else{S.userLat=23.8041;S.userLng=90.3656;}
   }
-  if(!found){S.userLat=23.8041;S.userLng=90.3656;}
-  S.locAddr=val+' (Manual)';
+  S.locAddr=val;
   S.locMode='manual';
+  document.getElementById('loc-suggestions').style.display='none';
   persist();updateLocBar();
   closeLocModal();
   if(S.activeService) renderServiceList(S.activeService);
@@ -1307,6 +1455,13 @@ function checkManualInput(){
   const btn=document.getElementById('manual-submit');
   btn.disabled=!v;
 }
+
+// Close suggestions on outside click
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('loc-manual-panel');
+  if(panel&&!panel.contains(e.target))
+    document.getElementById('loc-suggestions').style.display='none';
+});
 
 function openLocModal(){
   document.getElementById('loc-modal').classList.add('open');
@@ -1334,6 +1489,10 @@ function showView(name){
   document.getElementById('view-'+name).classList.add('active');
   S.prevView=S.currentView;
   S.currentView=name;
+  // Show loc-bar only on service/news/fav screens (not on home where hero shows it)
+  const locBar=document.getElementById('loc-bar');
+  if(name==='home') locBar.classList.remove('show');
+  else locBar.classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1725,6 +1884,46 @@ async function loadNews(){
       }
     }
   }catch(e){}
+  // Strategy 4: BBC South Asia RSS
+  try{
+    const rssUrl=encodeURIComponent('http://feeds.bbci.co.uk/news/world/asia/rss.xml');
+    const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+rssUrl+'&count=20',{signal:AbortSignal.timeout(7000)});
+    if(r.ok){
+      const d=await r.json();
+      if(d.items&&d.items.length>0){
+        const kw=['bangladesh','flood','cyclone','earthquake','disaster','fire','storm','emergency'];
+        let items=d.items.filter(i=>kw.some(k=>(i.title||'').toLowerCase().includes(k)||(i.description||'').toLowerCase().includes(k)));
+        if(items.length>=2){
+          newsCache=items.slice(0,9).map(a=>({
+            title:a.title,
+            description:a.description?a.description.replace(/<[^>]*>/g,'').substring(0,200):'',
+            url:a.link,urlToImage:a.thumbnail||a.enclosure?.link||null,publishedAt:a.pubDate,
+            source:{name:'BBC News'},
+            cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))
+          }));
+          renderNews(newsCache,grid);return;
+        }
+      }
+    }
+  }catch(e){}
+  // Strategy 5: ReliefWeb (humanitarian news, always has disaster content)
+  try{
+    const rwUrl='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://reliefweb.int/country/bgd/rss.xml')+'&count=9';
+    const r=await fetch(rwUrl,{signal:AbortSignal.timeout(7000)});
+    if(r.ok){
+      const d=await r.json();
+      if(d.items&&d.items.length>0){
+        newsCache=d.items.slice(0,9).map(a=>({
+          title:a.title,
+          description:a.description?a.description.replace(/<[^>]*>/g,'').substring(0,200):'',
+          url:a.link,urlToImage:a.thumbnail||null,publishedAt:a.pubDate,
+          source:{name:'ReliefWeb'},
+          cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))
+        }));
+        renderNews(newsCache,grid);return;
+      }
+    }
+  }catch(e){}
   // Final fallback
   newsCache=FALLBACK_NEWS;renderNews(newsCache,grid);
 }
@@ -1759,8 +1958,9 @@ function renderNews(articles,grid){
     return`<a href="${a.url||'#'}" target="_blank" rel="noopener" class="news-card" style="animation-delay:${delay}ms">
       <div class="news-img-wrap">
         ${hasImg
-          ?`<img src="${a.urlToImage}" alt="${(a.title||'').substring(0,50)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=news-fallback>${emoji}</div>'">`
-          :`<div class="news-fallback">${emoji}</div>`}
+          ?`<img src="${a.urlToImage}" alt="${(a.title||'').substring(0,50)}" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          :''}
+        <div class="news-fallback" style="${hasImg?'display:none':'display:flex'};background:${color}18;font-size:56px">${emoji}</div>
         <div class="news-cat" style="background:${color}">${cat}</div>
       </div>
       <div class="news-body">
@@ -1986,7 +2186,7 @@ function init(){
         },{enableHighAccuracy:true,timeout:15000,maximumAge:8000});
       },()=>{
         // GPS denied
-      },{enableHighAccuracy:true,timeout:10000});
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
     }
   }
 }
