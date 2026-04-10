@@ -88,14 +88,22 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 .logo-text small{display:block;font-family:var(--ff);font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.3px;margin-top:1px}
 
 /* ── SEARCH BAR ────────────────────────────────────────────────────────── */
-.search-wrap{flex:1;position:relative;max-width:480px}
-.search-input{width:100%;padding:10px 16px 10px 42px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r999);font-size:14px;font-family:var(--ff);color:var(--text);outline:none;transition:all .2s}
+.search-wrap{flex:1;position:relative;max-width:520px;min-width:0}
+/* Mobile: search moves to its own row below the topbar */
+@media(max-width:640px){
+  .topbar-inner{flex-wrap:wrap;height:auto;padding:10px 14px 0}
+  .topbar-logo{flex:1}
+  .topbar-actions{flex-shrink:0}
+  .search-wrap{order:3;flex:0 0 100%;max-width:100%;padding-bottom:10px}
+  #topbar{position:sticky;top:0}
+}
+.search-input{width:100%;padding:11px 40px 11px 44px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r999);font-size:15px;font-family:var(--ff);color:var(--text);outline:none;transition:all .2s}
 .search-input::placeholder{color:var(--text3)}
-.search-input:focus{border-color:var(--blue2);background:var(--surface);box-shadow:0 0 0 4px rgba(25,118,210,.1)}
+.search-input:focus{border-color:var(--blue2);background:var(--surface);box-shadow:0 0 0 4px rgba(25,118,210,.12)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
-.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--text3);border:none;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;cursor:pointer}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--text3);border:none;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;cursor:pointer}
 .search-clear.visible{display:flex}
-.search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);box-shadow:var(--shadow3);z-index:200;max-height:320px;overflow-y:auto;display:none}
+.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);box-shadow:var(--shadow3);z-index:200;max-height:360px;overflow-y:auto;display:none}
 .search-results.open{display:block;animation:dropIn .2s ease}
 @keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .search-result-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
@@ -134,6 +142,13 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 @media(max-width:768px){
   #bottom-nav{display:block}
   #app{padding-bottom:var(--bottom-nav)}
+}
+@media(max-width:640px){
+  /* topbar is taller on mobile (2 rows), adjust offsets */
+  :root{--nav:112px}
+  #offline-strip{top:var(--nav)}
+  .svc-topbar{top:var(--nav)}
+  .bt-bar{top:calc(var(--nav) + 56px)}
 }
 
 /* ── LOCATION BAR ──────────────────────────────────────────────────────── */
@@ -288,39 +303,73 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r18);padding:16px;margin-bottom:10px}
 
-/* ── GOOGLE MAPS MODAL ─────────────────────────────────────────────────── */
+/* ── MAP MODAL ─────────────────────────────────────────────────────────── */
 #map-modal{
   position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,.65);
-  backdrop-filter:blur(8px);
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
   display:none;align-items:flex-end;justify-content:center;
 }
-#map-modal.open{display:flex;animation:fadeIn .25s ease}
+#map-modal.open{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .map-sheet{
   background:var(--surface);
-  width:100%;max-width:760px;
+  width:100%;max-width:820px;
   border-radius:24px 24px 0 0;
   overflow:hidden;
-  animation:sheetUp .35s cubic-bezier(.16,1,.3,1);
-  max-height:90vh;
+  animation:sheetUp .38s cubic-bezier(.16,1,.3,1);
+  max-height:92vh;
   display:flex;flex-direction:column;
 }
-@media(min-width:600px){.map-sheet{border-radius:24px;margin:20px;max-height:80vh}}
+@media(min-width:640px){.map-sheet{border-radius:24px;margin:20px;max-height:85vh}}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.map-sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:4px;margin:12px auto 0}
-.map-sheet-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.map-sheet-title{font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--text);flex:1;letter-spacing:-.2px}
-.map-sheet-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.map-close{width:32px;height:32px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s}
-.map-close:hover{background:var(--surface3)}
-.map-close svg{width:16px;height:16px;fill:var(--text)}
-#gmap-iframe-wrap{flex:1;min-height:300px;position:relative}
-#gmap-iframe-wrap iframe{width:100%;height:100%;border:none;min-height:300px}
-.map-actions{padding:16px 20px;display:flex;gap:10px;border-top:1px solid var(--border)}
-.map-action-btn{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:700;font-family:var(--ff);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;text-decoration:none}
+.map-handle-row{padding:10px 0 0;display:flex;justify-content:center}
+.map-sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:4px}
+
+/* ── Map info header ── */
+.map-info-head{padding:14px 18px 12px;border-bottom:1px solid var(--border)}
+.map-info-row1{display:flex;align-items:flex-start;gap:12px}
+.map-svc-badge{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex-shrink:0;font-size:22px}
+.map-name-block{flex:1;min-width:0}
+.map-sheet-title{font-family:var(--ffd);font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.3px;line-height:1.2;margin-bottom:2px}
+.map-sheet-addr{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.map-sheet-addr svg{width:11px;height:11px;fill:var(--text3);flex-shrink:0}
+.map-type-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.3px}
+.map-close{width:32px;height:32px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.map-close:hover{background:var(--red3);border-color:var(--red)}
+.map-close svg{width:15px;height:15px;fill:var(--text)}
+
+/* ── Distance & ETA strip ── */
+.map-stats-strip{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface2)}
+.map-stat-box{flex:1;padding:10px 12px;text-align:center;border-right:1px solid var(--border)}
+.map-stat-box:last-child{border-right:none}
+.map-stat-val{font-family:var(--ffd);font-size:17px;font-weight:900;color:var(--text);line-height:1}
+.map-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;font-weight:600}
+
+/* ── OSM map iframe area ── */
+#gmap-iframe-wrap{flex:1;min-height:280px;position:relative;overflow:hidden}
+@media(min-width:640px){#gmap-iframe-wrap{min-height:340px}}
+#gmap-iframe-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.map-loading-overlay{position:absolute;inset:0;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:2;transition:opacity .4s}
+.map-loading-overlay.loaded{opacity:0;pointer-events:none}
+.map-spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--blue2);border-radius:50%;animation:spinAnim .9s linear infinite}
+.map-loading-text{font-size:13px;color:var(--text3);font-weight:500}
+
+/* ── Quick info row under map ── */
+.map-quick-info{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--surface)}
+.map-quick-info::-webkit-scrollbar{display:none}
+.mqi-chip{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r999);padding:6px 12px;white-space:nowrap;flex-shrink:0}
+.mqi-chip span{font-size:12px;font-weight:600;color:var(--text2)}
+.mqi-chip strong{font-size:12px;font-weight:800;color:var(--text)}
+
+/* ── Action buttons ── */
+.map-actions{padding:12px 16px 14px;display:flex;gap:8px}
+.map-action-btn{flex:1;padding:13px 10px;border-radius:14px;font-size:13px;font-weight:700;font-family:var(--ff);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;text-decoration:none;min-height:48px}
+.map-action-btn:hover{filter:brightness(.93)}
 .map-action-btn:active{transform:scale(.97)}
-.map-action-btn svg{width:16px;height:16px;fill:currentColor}
+.map-action-btn svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+.map-btn-share{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);max-width:48px;min-width:48px;border-radius:14px}
 
 /* ── LOCATION MODAL ────────────────────────────────────────────────────── */
 #loc-modal{
@@ -424,6 +473,10 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
 .hero-h{font-family:var(--ffd);font-size:clamp(22px,5vw,34px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.5px;margin-bottom:8px}
 .hero-h em{color:#EF9A9A;font-style:normal}
 .hero-p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.65;max-width:440px;margin-bottom:16px}
+.hero-loc-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.hero-loc-row span{font-size:13px;color:rgba(255,255,255,.75);font-weight:500;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-loc-change{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.hero-loc-change:hover{background:rgba(255,255,255,.25)}
 .hero-stats{display:flex;gap:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;flex-wrap:wrap}
 .hero-stat{flex:1;min-width:70px;text-align:center;padding:12px 8px;border-right:1px solid rgba(255,255,255,.08)}
 .hero-stat:last-child{border-right:none}
@@ -544,8 +597,16 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
     <!-- Hero -->
     <div class="hero-banner">
       <div class="hero-inner">
-        <div class="hero-live"><span class="hero-live-dot"></span><span>Live · Dhaka Metropolitan Area</span></div>
+        <div class="hero-live" id="hero-live-pill">
+          <span class="hero-live-dot" id="hero-live-dot"></span>
+          <span id="hero-live-text">Detecting location…</span>
+        </div>
         <div class="hero-h">One Tap<br><em>Emergency Help</em></div>
+        <div class="hero-loc-row" id="hero-loc-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.5)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span id="hero-loc-addr">Kafrul, Mirpur, Dhaka</span>
+          <button class="hero-loc-change" onclick="openLocModal()">Change</button>
+        </div>
         <div class="hero-p">Find nearest hospitals, fire stations, police, pharmacies, shelters and blood donors instantly.</div>
         <div class="hero-stats">
           <div class="hero-stat"><div class="hero-stat-num">45</div><div class="hero-stat-lbl">Hospitals</div></div>
@@ -678,34 +739,76 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
   </div>
 </div>
 
-<!-- GOOGLE MAP MODAL -->
+<!-- MAP MODAL — redesigned informatic view -->
 <div id="map-modal" onclick="closeMapModal(event)">
-  <div class="map-sheet">
-    <div class="map-sheet-handle"></div>
-    <div class="map-sheet-head">
-      <div>
-        <div class="map-sheet-title" id="map-title">Directions</div>
-        <div class="map-sheet-sub" id="map-sub"></div>
+  <div class="map-sheet" onclick="event.stopPropagation()">
+    <div class="map-handle-row"><div class="map-sheet-handle"></div></div>
+
+    <!-- Info header -->
+    <div class="map-info-head">
+      <div class="map-info-row1">
+        <div class="map-svc-badge" id="map-svc-badge" style="background:#FFEBEE">🏥</div>
+        <div class="map-name-block">
+          <div class="map-sheet-title" id="map-title">Loading…</div>
+          <div class="map-sheet-addr">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span id="map-sub">—</span>
+          </div>
+          <span class="map-type-badge" id="map-type-badge" style="background:#FFEBEE;color:#C62828"></span>
+        </div>
+        <button class="map-close" onclick="closeMapModalBtn()">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
       </div>
-      <button class="map-close" onclick="closeMapModalBtn()">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
     </div>
+
+    <!-- Distance / ETA / coords strip -->
+    <div class="map-stats-strip">
+      <div class="map-stat-box">
+        <div class="map-stat-val" id="map-dist-val">—</div>
+        <div class="map-stat-lbl">Distance</div>
+      </div>
+      <div class="map-stat-box">
+        <div class="map-stat-val" id="map-eta-val">—</div>
+        <div class="map-stat-lbl">Est. drive</div>
+      </div>
+      <div class="map-stat-box">
+        <div class="map-stat-val" id="map-coords-val" style="font-size:11px;padding-top:3px">—</div>
+        <div class="map-stat-lbl">Coordinates</div>
+      </div>
+    </div>
+
+    <!-- OSM map -->
     <div id="gmap-iframe-wrap">
-      <div id="gmap-placeholder" style="width:100%;height:300px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--text3)"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
-        <div id="gmap-loading-text" style="color:var(--text3);font-size:13px">Loading map…</div>
+      <div class="map-loading-overlay" id="map-loading-overlay">
+        <div class="map-spinner"></div>
+        <div class="map-loading-text">Loading map…</div>
       </div>
     </div>
+
+    <!-- Quick info chips -->
+    <div class="map-quick-info" id="map-quick-info">
+      <div class="mqi-chip"><span>📞</span><strong id="map-phone-chip">—</strong></div>
+      <div class="mqi-chip" id="map-open-chip" style="display:none"><span>🕐</span><strong id="map-open-text">—</strong></div>
+      <div class="mqi-chip" id="map-ambul-chip" style="display:none"><span>🚑</span><strong>Ambulance available</strong></div>
+      <div class="mqi-chip" id="map-open24-chip" style="display:none"><span>⏰</span><strong>Open 24 / 7</strong></div>
+      <div class="mqi-chip" id="map-cap-chip" style="display:none"><span>🏠</span><strong id="map-cap-text"></strong></div>
+      <div class="mqi-chip"><span>🗺️</span><strong id="map-area-chip">Dhaka</strong></div>
+    </div>
+
+    <!-- Action buttons -->
     <div class="map-actions">
       <a id="map-gmaps-link" href="#" target="_blank" class="map-action-btn" style="background:var(--blue2);color:#fff" onclick="haptic(80)">
         <svg viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 00-1.42 0l-9 9a1 1 0 000 1.42l9 9a1 1 0 001.42 0l9-9a1 1 0 000-1.42zM14 14.5V12h-4v3H8v-4a1 1 0 011-1h5V7.5l3.5 3.5-3.5 3.5z"/></svg>
-        Open in Google Maps
+        Get Directions
       </a>
-      <a id="map-call-link" href="#" class="map-action-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="haptic([100,50,200])">
+      <a id="map-call-link" href="#" class="map-action-btn" style="background:var(--red);color:#fff" onclick="haptic([100,50,200])">
         <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-        Call
+        Call Now
       </a>
+      <button class="map-action-btn map-btn-share" onclick="sharePlace()" title="Share location">
+        <svg viewBox="0 0 24 24" fill="var(--text2)"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+      </button>
     </div>
   </div>
 </div>
@@ -747,83 +850,193 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
 const DATA={
   hospital:[
     {id:'h1',n:"Dhaka Medical College Hospital",t:"Government",a:"Bakshibazar, Dhaka-1000",p:"02-55165088",lat:23.7257,lng:90.3954,ambulance:true},
-    {id:'h2',n:"Sir Salimullah Medical College",t:"Government",a:"Mitford Road, Dhaka-1100",p:"02-7319042",lat:23.7128,lng:90.4078,ambulance:true},
+    {id:'h2',n:"Sir Salimullah Medical College Hospital",t:"Government",a:"Mitford Road, Dhaka-1100",p:"02-7319042",lat:23.7128,lng:90.4078,ambulance:true},
     {id:'h3',n:"BSMMU (PG Hospital)",t:"Government",a:"Shahbagh, Dhaka-1000",p:"02-55165300",lat:23.7399,lng:90.3963,ambulance:true},
     {id:'h4',n:"Shaheed Suhrawardy Medical College",t:"Government",a:"Sher-e-Bangla Nagar, Dhaka-1207",p:"02-9118243",lat:23.7735,lng:90.3681,ambulance:true},
     {id:'h5',n:"Square Hospital Ltd.",t:"Private",a:"18/F Panthapath, Dhaka-1205",p:"10616",lat:23.7516,lng:90.3848,ambulance:true},
-    {id:'h6',n:"National Heart Foundation",t:"Semi-Govt",a:"Plot 7/2, Mirpur-2, Dhaka-1216",p:"02-9003478",lat:23.7895,lng:90.3635,ambulance:false},
-    {id:'h7',n:"United Hospital Ltd.",t:"Private",a:"Plot 15, Road 71, Gulshan",p:"10666",lat:23.7805,lng:90.4152,ambulance:true},
-    {id:'h8',n:"Apollo Hospitals Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A",p:"02-55044444",lat:23.8133,lng:90.4300,ambulance:true},
-    {id:'h9',n:"Labaid Specialized Hospital",t:"Private",a:"House 01, Road 04, Dhanmondi",p:"16484",lat:23.7478,lng:90.3742,ambulance:false},
-    {id:'h10',n:"Ibn Sina Hospital",t:"Private",a:"House 48, Road 9/A, Dhanmondi",p:"02-9671364",lat:23.7457,lng:90.3729,ambulance:true},
-    {id:'h11',n:"Holy Family Red Crescent",t:"Private",a:"1 Eskaton Garden Road, Dhaka-1000",p:"02-9345310",lat:23.7379,lng:90.4017,ambulance:true},
-    {id:'h12',n:"BIRDEM General Hospital",t:"Semi-Govt",a:"122 Kazi Nazrul Islam Ave",p:"02-9661551",lat:23.7386,lng:90.3942,ambulance:false},
+    {id:'h6',n:"National Heart Foundation Hospital",t:"Semi-Govt",a:"Plot 7/2, Mirpur-2, Dhaka-1216",p:"02-9003478",lat:23.7895,lng:90.3635,ambulance:false},
+    {id:'h7',n:"United Hospital Ltd.",t:"Private",a:"Plot 15, Road 71, Gulshan-2, Dhaka",p:"10666",lat:23.7805,lng:90.4152,ambulance:true},
+    {id:'h8',n:"Apollo Hospitals Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A, Dhaka-1229",p:"02-55044444",lat:23.8133,lng:90.4300,ambulance:true},
+    {id:'h9',n:"Labaid Specialized Hospital",t:"Private",a:"House 01, Road 04, Dhanmondi, Dhaka-1205",p:"16484",lat:23.7478,lng:90.3742,ambulance:false},
+    {id:'h10',n:"Ibn Sina Hospital Dhanmondi",t:"Private",a:"House 48, Road 9/A, Dhanmondi, Dhaka",p:"02-9671364",lat:23.7457,lng:90.3729,ambulance:true},
+    {id:'h11',n:"Holy Family Red Crescent Hospital",t:"Private",a:"1 Eskaton Garden Road, Dhaka-1000",p:"02-9345310",lat:23.7379,lng:90.4017,ambulance:true},
+    {id:'h12',n:"BIRDEM General Hospital",t:"Semi-Govt",a:"122 Kazi Nazrul Islam Ave, Dhaka-1000",p:"02-9661551",lat:23.7386,lng:90.3942,ambulance:false},
     {id:'h13',n:"Mugda Medical College Hospital",t:"Government",a:"Mugda, Dhaka-1214",p:"02-7272007",lat:23.7316,lng:90.4339,ambulance:true},
     {id:'h14',n:"Kurmitola General Hospital",t:"Government",a:"Kurmitola, Dhaka Cantonment",p:"02-8960034",lat:23.8234,lng:90.3904,ambulance:true},
-    {id:'h15',n:"Evercare Hospital Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A",p:"02-55044444",lat:23.8135,lng:90.4302,ambulance:true}
+    {id:'h15',n:"Evercare Hospital Dhaka",t:"Private",a:"Plot 81, Bashundhara R/A, Dhaka-1229",p:"02-55044444",lat:23.8135,lng:90.4302,ambulance:true},
+    {id:'h16',n:"Anwer Khan Modern Hospital",t:"Private",a:"House 65, Road 8/A, Dhanmondi, Dhaka",p:"09612-300300",lat:23.7449,lng:90.3737,ambulance:true},
+    {id:'h17',n:"Popular Medical Centre Dhanmondi",t:"Private",a:"House 16, Road 2, Dhanmondi, Dhaka",p:"16484",lat:23.7490,lng:90.3752,ambulance:false},
+    {id:'h18',n:"Bangladesh Medical College Hospital",t:"Private",a:"House 23, Road 2, Dhanmondi, Dhaka",p:"01713-001234",lat:23.7478,lng:90.3758,ambulance:true},
+    {id:'h19',n:"Dhaka Shishu Hospital",t:"Government",a:"Shishu Hospital Rd, Sher-e-Bangla Nagar",p:"02-9119002",lat:23.7722,lng:90.3678,ambulance:false},
+    {id:'h20',n:"National Institute of Cancer Research",t:"Government",a:"Mohakhali, Dhaka-1212",p:"02-8833192",lat:23.7787,lng:90.4015,ambulance:false},
+    {id:'h21',n:"Ad-din Medical College Hospital",t:"Private",a:"2 Bara Maghbazar, Dhaka-1217",p:"02-9354201",lat:23.7456,lng:90.4068,ambulance:true},
+    {id:'h22',n:"Central Hospital Ltd.",t:"Private",a:"2 Green Rd, Dhanmondi, Dhaka-1205",p:"02-9664440",lat:23.7512,lng:90.3812,ambulance:true},
+    {id:'h23',n:"Islami Bank Central Hospital",t:"Private",a:"29 Kakrail, Dhaka-1000",p:"09611-021021",lat:23.7395,lng:90.3998,ambulance:true},
+    {id:'h24',n:"Medinova Medical Services Baridhara",t:"Private",a:"House 5, Road 4, Baridhara, Dhaka",p:"02-9886170",lat:23.8063,lng:90.4236,ambulance:false},
+    {id:'h25',n:"Green Life Medical College Hospital",t:"Private",a:"32 Bir Uttam Qazi Nuruzzaman Sarak, Dhaka",p:"02-9881244",lat:23.7613,lng:90.3952,ambulance:true},
+    {id:'h26',n:"National Institute of Cardiovascular Disease",t:"Government",a:"Sher-e-Bangla Nagar, Dhaka-1207",p:"02-9118371",lat:23.7742,lng:90.3672,ambulance:true},
+    {id:'h27',n:"National Institute of Diseases of Chest",t:"Government",a:"Mohakhali, Dhaka-1212",p:"02-9882363",lat:23.7771,lng:90.4001,ambulance:false},
+    {id:'h28',n:"Dhaka Community Medical College Hospital",t:"Private",a:"190/1 Moghbazar, Dhaka-1217",p:"02-9350001",lat:23.7438,lng:90.4071,ambulance:true},
+    {id:'h29',n:"Ibn Sina Hospital Mirpur",t:"Private",a:"Section 11, Mirpur, Dhaka-1216",p:"02-8051234",lat:23.8056,lng:90.3580,ambulance:true},
+    {id:'h30',n:"Uttara Adhunik Medical College Hospital",t:"Private",a:"House 1, Road 10, Sector 5, Uttara",p:"02-8952789",lat:23.8630,lng:90.3970,ambulance:true},
+    {id:'h31',n:"Samorita Hospital Ltd.",t:"Private",a:"89/1 Panthapath, Dhaka-1205",p:"02-9669030",lat:23.7508,lng:90.3861,ambulance:true},
+    {id:'h32',n:"Dhaka National Medical College Hospital",t:"Private",a:"14-16 Johnson Road, Dhaka-1100",p:"02-7114413",lat:23.7136,lng:90.4065,ambulance:true},
+    {id:'h33',n:"Farazy Hospital Jatrabari",t:"Private",a:"Jatrabari, Dhaka-1204",p:"02-7553456",lat:23.7096,lng:90.4291,ambulance:false},
+    {id:'h34',n:"Bangladesh Specialized Hospital",t:"Private",a:"21 Shyamoli, Dhaka-1207",p:"02-9130565",lat:23.7728,lng:90.3567,ambulance:true},
+    {id:'h35',n:"Trauma Centre Bijoy Sarani",t:"Government",a:"Bijoy Sarani, Dhaka-1215",p:"02-8114460",lat:23.7572,lng:90.3912,ambulance:true},
+    {id:'h36',n:"Narayanganj 300-Bed District Hospital",t:"Government",a:"Narayanganj Sadar, Narayanganj",p:"02-7640162",lat:23.6231,lng:90.4997,ambulance:true},
+    {id:'h37',n:"Tongi 50-Bed Upazila Hospital",t:"Government",a:"Tongi, Gazipur",p:"02-9812345",lat:23.8984,lng:90.3997,ambulance:true},
+    {id:'h38',n:"Gazipur Sadar Hospital",t:"Government",a:"Gazipur Sadar, Gazipur",p:"02-9251001",lat:23.9999,lng:90.4148,ambulance:true},
+    {id:'h39',n:"Savar Upazila Health Complex",t:"Government",a:"Savar Bazar, Savar, Dhaka",p:"02-7703002",lat:23.8576,lng:90.2669,ambulance:false},
+    {id:'h40',n:"Keraniganj Upazila Health Complex",t:"Government",a:"Keraniganj, Dhaka",p:"02-7760001",lat:23.6862,lng:90.3820,ambulance:false},
+    {id:'h41',n:"Ashulia Urban Health Centre",t:"Government",a:"Ashulia, Savar, Dhaka",p:"02-7703100",lat:23.8792,lng:90.3040,ambulance:false},
+    {id:'h42',n:"Rupganj Upazila Health Complex",t:"Government",a:"Rupganj, Narayanganj",p:"02-7440001",lat:23.7438,lng:90.5108,ambulance:false},
+    {id:'h43',n:"Comfort Nursing Home Eskaton",t:"Private",a:"162 New Eskaton Rd, Dhaka-1000",p:"02-9357580",lat:23.7401,lng:90.4005,ambulance:false},
+    {id:'h44',n:"Diabetic Association Hospital Banglamotor",t:"Semi-Govt",a:"122 Kazi Nazrul Islam Ave, Banglamotor",p:"02-9661551",lat:23.7382,lng:90.3938,ambulance:false},
+    {id:'h45',n:"Popular Medical Centre Mirpur",t:"Private",a:"Plot 14, Mirpur-10, Dhaka-1216",p:"01714-000001",lat:23.8085,lng:90.3560,ambulance:true}
   ],
   fire:[
-    {id:'f1',n:"Mirpur Station (Main North)",t:"Main Station",a:"Mirpur 10 Roundabout, Dhaka 1216",p:"01730002229",lat:23.8091,lng:90.3672},
-    {id:'f2',n:"Mohammadpur Station",t:"Zone Station",a:"Mirpur Rd, Dhaka 1205",p:"01730002227",lat:23.7642,lng:90.3568},
-    {id:'f3',n:"Gulshan Station (Tejgaon)",t:"Zone Station",a:"Shaheed Tajuddin Ahmed Ave",p:"01730002226",lat:23.7643,lng:90.4073},
-    {id:'f4',n:"Siddhirganj HQ Station",t:"HQ",a:"36-48 Kazi Alauddin Rd, Dhaka 1000",p:"01730002200",lat:23.7253,lng:90.4028},
-    {id:'f5',n:"Cantonment Station",t:"Zone Station",a:"Shaheen College Rd, Dhaka 1206",p:"01730002232",lat:23.8098,lng:90.3846},
-    {id:'f6',n:"Uttara Station",t:"Zone Station",a:"Sonargaon Janapath, Dhaka 1230",p:"01730082230",lat:23.8758,lng:90.3979},
-    {id:'f7',n:"Rampura Station",t:"Zone Station",a:"Shantipur Rd 02, Dhaka 1219",p:"01730002225",lat:23.7559,lng:90.4338},
-    {id:'f8',n:"Baridhara Station",t:"Zone Station",a:"Baridhara, Dhaka",p:"01724010458",lat:23.8063,lng:90.4236},
-    {id:'f9',n:"Lalbagh Station",t:"Zone Station",a:"22/1 Nur Fattah Lane, Lalbagh",p:"01730002218",lat:23.7213,lng:90.3872},
-    {id:'f10',n:"Gandaria Station",t:"Zone Station",a:"R M Dash Rd, Dhaka",p:"01794117037",lat:23.7130,lng:90.4192},
-    {id:'f11',n:"Demra Station",t:"Zone Station",a:"Demra, Dhaka",p:"01730002240",lat:23.7030,lng:90.4593},
-    {id:'f12',n:"Jatrabari Station",t:"Zone Station",a:"Jatrabari, Dhaka",p:"01730002238",lat:23.7076,lng:90.4373},
-    {id:'f13',n:"Khilgaon Station",t:"Zone Station",a:"Khilgaon, Dhaka",p:"01730002235",lat:23.7471,lng:90.4283},
-    {id:'f14',n:"Hazaribagh Station",t:"Zone Station",a:"Hazaribagh, Dhaka",p:"01730002222",lat:23.7267,lng:90.3779},
-    {id:'f15',n:"Shyampur Station",t:"Zone Station",a:"Shyampur, Dhaka",p:"01730002242",lat:23.7052,lng:90.4478},
-    {id:'f16',n:"Lalbagh Sub-Station",t:"Zone Station",a:"Lalbagh, Dhaka",p:"01730002218",lat:23.7210,lng:90.3868},
-    {id:'f17',n:"Turag Station",t:"Zone Station",a:"Turag, Dhaka",p:"01730002248",lat:23.8546,lng:90.3568},
-    {id:'f18',n:"Keraniganj Station",t:"Zone Station",a:"Keraniganj, Dhaka",p:"01730002250",lat:23.6862,lng:90.3820}
+    {id:'f1',n:"Mirpur Fire Station (Main North)",t:"Main Station",a:"Mirpur 10 Roundabout, Dhaka-1216",p:"01730002229",lat:23.8091,lng:90.3672},
+    {id:'f2',n:"Mohammadpur Fire Station",t:"Zone Station",a:"Mirpur Rd, Dhaka-1205",p:"01730002227",lat:23.7642,lng:90.3568},
+    {id:'f3',n:"Gulshan Fire Station",t:"Zone Station",a:"Shaheed Tajuddin Ahmed Ave, Dhaka-1208",p:"01730002226",lat:23.7643,lng:90.4073},
+    {id:'f4',n:"Siddhirganj HQ Fire Station",t:"HQ",a:"36-48 Kazi Alauddin Rd, Dhaka-1000",p:"01730002200",lat:23.7253,lng:90.4028},
+    {id:'f5',n:"Cantonment Fire Station",t:"Zone Station",a:"Shaheen College Rd, Dhaka-1206",p:"01730002232",lat:23.8098,lng:90.3846},
+    {id:'f6',n:"Uttara Fire Station",t:"Zone Station",a:"Sonargaon Janapath, Dhaka-1230",p:"01730082230",lat:23.8758,lng:90.3979},
+    {id:'f7',n:"Rampura Fire Station",t:"Zone Station",a:"Shantipur Rd 02, Dhaka-1219",p:"01730002225",lat:23.7559,lng:90.4338},
+    {id:'f8',n:"Baridhara Fire Station",t:"Zone Station",a:"Baridhara, Dhaka",p:"01724010458",lat:23.8063,lng:90.4236},
+    {id:'f9',n:"Lalbagh Fire Station",t:"Zone Station",a:"22/1 Nur Fattah Lane, Lalbagh, Dhaka",p:"01730002218",lat:23.7213,lng:90.3872},
+    {id:'f10',n:"Gandaria Fire Station",t:"Zone Station",a:"R M Dash Rd, Dhaka",p:"01794117037",lat:23.7130,lng:90.4192},
+    {id:'f11',n:"Demra Fire Station",t:"Zone Station",a:"Demra, Dhaka",p:"01730002240",lat:23.7030,lng:90.4593},
+    {id:'f12',n:"Jatrabari Fire Station",t:"Zone Station",a:"Jatrabari, Dhaka-1204",p:"01730002238",lat:23.7076,lng:90.4373},
+    {id:'f13',n:"Khilgaon Fire Station",t:"Zone Station",a:"Khilgaon, Dhaka-1219",p:"01730002235",lat:23.7471,lng:90.4283},
+    {id:'f14',n:"Hazaribagh Fire Station",t:"Zone Station",a:"Hazaribagh, Dhaka-1209",p:"01730002222",lat:23.7267,lng:90.3779},
+    {id:'f15',n:"Shyampur Fire Station",t:"Zone Station",a:"Shyampur, Dhaka-1204",p:"01730002242",lat:23.7052,lng:90.4478},
+    {id:'f16',n:"Turag Fire Station",t:"Zone Station",a:"Turag, Dhaka",p:"01730002248",lat:23.8546,lng:90.3568},
+    {id:'f17',n:"Keraniganj Fire Station",t:"Zone Station",a:"Keraniganj, Dhaka",p:"01730002250",lat:23.6862,lng:90.3820},
+    {id:'f18',n:"Savar Fire Station",t:"Zone Station",a:"Savar Bazar, Dhaka",p:"01730002260",lat:23.8576,lng:90.2669},
+    {id:'f19',n:"Narayanganj Fire Station",t:"Zone Station",a:"Narayanganj Sadar",p:"01730002270",lat:23.6238,lng:90.4975},
+    {id:'f20',n:"Gazipur Fire Station",t:"Zone Station",a:"Gazipur Sadar, Gazipur",p:"01730002280",lat:23.9999,lng:90.4148},
+    {id:'f21',n:"Tongi Fire Station",t:"Zone Station",a:"Tongi, Gazipur",p:"01730002290",lat:23.8984,lng:90.3997},
+    {id:'f22',n:"Pallabi Fire Station",t:"Zone Station",a:"Pallabi, Dhaka-1216",p:"01730002300",lat:23.8243,lng:90.3626},
+    {id:'f23',n:"Badda Fire Post",t:"Zone Station",a:"Badda, Dhaka-1212",p:"01730002310",lat:23.7838,lng:90.4289},
+    {id:'f24',n:"Sutrapur Fire Station",t:"Zone Station",a:"Sutrapur, Dhaka-1100",p:"01730002215",lat:23.7186,lng:90.4148},
+    {id:'f25',n:"Wari Fire Station",t:"Zone Station",a:"Wari, Dhaka-1203",p:"01730002210",lat:23.7198,lng:90.4143}
   ],
   police:[
-    {id:'p1',n:"Kafrul Police Station",a:"Mirpur-14, Dhaka",p:"01713373191",lat:23.8072,lng:90.3648},
-    {id:'p2',n:"Pallabi Police Station",a:"Pallabi, Dhaka",p:"01713373190",lat:23.8243,lng:90.3626},
-    {id:'p3',n:"Mirpur Police Station",a:"Mirpur, Dhaka",p:"01713373189",lat:23.8055,lng:90.3561},
-    {id:'p4',n:"Shah Ali Police Station",a:"Shah Ali, Dhaka",p:"01713373192",lat:23.8154,lng:90.3522},
-    {id:'p5',n:"Darus Salam Police Station",a:"100 Golartek, Mirpur",p:"01713398334",lat:23.7958,lng:90.3518},
-    {id:'p6',n:"Mohammadpur Police Station",a:"Mohammadpur, Dhaka",p:"01713373182",lat:23.7639,lng:90.3571},
+    {id:'p1',n:"Kafrul Police Station",a:"Mirpur-14, Dhaka-1206",p:"01713373191",lat:23.8072,lng:90.3648},
+    {id:'p2',n:"Pallabi Police Station",a:"Pallabi, Dhaka-1216",p:"01713373190",lat:23.8243,lng:90.3626},
+    {id:'p3',n:"Mirpur Model Police Station",a:"Mirpur-1, Dhaka-1216",p:"01713373189",lat:23.8055,lng:90.3561},
+    {id:'p4',n:"Shah Ali Police Station",a:"Shah Ali, Dhaka-1216",p:"01713373192",lat:23.8154,lng:90.3522},
+    {id:'p5',n:"Darus Salam Police Station",a:"100 Golartek, Mirpur, Dhaka",p:"01713398334",lat:23.7958,lng:90.3518},
+    {id:'p6',n:"Mohammadpur Police Station",a:"Mohammadpur, Dhaka-1207",p:"01713373182",lat:23.7639,lng:90.3571},
     {id:'p7',n:"Adabor Police Station",a:"House 105/A, Ring Road, Shamoli",p:"01713373183",lat:23.7726,lng:90.3487},
-    {id:'p8',n:"Tejgaon Police Station",a:"Tejgaon, Dhaka",p:"01713373180",lat:23.7612,lng:90.3945},
-    {id:'p9',n:"Dhanmondi Police Station",a:"R#6, H#21, Dhanmondi",p:"01713373126",lat:23.7470,lng:90.3752},
-    {id:'p10',n:"Banani Police Station",a:"R-7, H-37, Banani, Dhaka",p:"01769058053",lat:23.7930,lng:90.4037},
-    {id:'p11',n:"Gulshan Police Station",a:"Gulshan-2, Dhaka",p:"01713373175",lat:23.7926,lng:90.4148},
-    {id:'p12',n:"Uttara Police Station",a:"Uttara, Sector-3, Dhaka",p:"01713373160",lat:23.8730,lng:90.3994},
-    {id:'p13',n:"Wari Police Station",a:"Wari, Dhaka",p:"01713373130",lat:23.7189,lng:90.4173},
-    {id:'p14',n:"Lalbagh Police Station",a:"Lalbagh, Dhaka",p:"01713373120",lat:23.7208,lng:90.3884},
-    {id:'p15',n:"Kotwali Police Station",a:"Kotwali, Dhaka",p:"01713373110",lat:23.7193,lng:90.4053},
-    {id:'p16',n:"Hazaribagh Police Station",a:"Hazaribagh, Dhaka",p:"01713373118",lat:23.7260,lng:90.3764},
-    {id:'p17',n:"Khilgaon Police Station",a:"Khilgaon, Dhaka",p:"01713373144",lat:23.7479,lng:90.4292},
-    {id:'p18',n:"Rampura Police Station",a:"Rampura, Dhaka",p:"01713373146",lat:23.7560,lng:90.4350},
-    {id:'p19',n:"Sabujbagh Police Station",a:"Sabujbagh, Dhaka",p:"01713373148",lat:23.7356,lng:90.4418},
-    {id:'p20',n:"Jatrabari Police Station",a:"Jatrabari, Dhaka",p:"01713373150",lat:23.7082,lng:90.4368}
+    {id:'p8',n:"Tejgaon Industrial Police Station",a:"Tejgaon, Dhaka-1208",p:"01713373180",lat:23.7612,lng:90.3945},
+    {id:'p9',n:"Dhanmondi Police Station",a:"R#6, H#21, Dhanmondi, Dhaka",p:"01713373126",lat:23.7470,lng:90.3752},
+    {id:'p10',n:"Banani Police Station",a:"R-7, H-37, Banani, Dhaka-1213",p:"01769058053",lat:23.7930,lng:90.4037},
+    {id:'p11',n:"Gulshan Police Station",a:"Gulshan-2, Dhaka-1212",p:"01713373175",lat:23.7926,lng:90.4148},
+    {id:'p12',n:"Uttara West Police Station",a:"Uttara, Sector-3, Dhaka-1230",p:"01713373160",lat:23.8730,lng:90.3994},
+    {id:'p13',n:"Wari Police Station",a:"Wari, Dhaka-1203",p:"01713373130",lat:23.7189,lng:90.4173},
+    {id:'p14',n:"Lalbagh Police Station",a:"Lalbagh, Dhaka-1211",p:"01713373120",lat:23.7208,lng:90.3884},
+    {id:'p15',n:"Kotwali Police Station",a:"Kotwali, Dhaka-1100",p:"01713373110",lat:23.7193,lng:90.4053},
+    {id:'p16',n:"Hazaribagh Police Station",a:"Hazaribagh, Dhaka-1209",p:"01713373118",lat:23.7260,lng:90.3764},
+    {id:'p17',n:"Khilgaon Police Station",a:"Khilgaon, Dhaka-1219",p:"01713373144",lat:23.7479,lng:90.4292},
+    {id:'p18',n:"Rampura Police Station",a:"Rampura, Dhaka-1219",p:"01713373146",lat:23.7560,lng:90.4350},
+    {id:'p19',n:"Sabujbagh Police Station",a:"Sabujbagh, Dhaka-1214",p:"01713373148",lat:23.7356,lng:90.4418},
+    {id:'p20',n:"Jatrabari Police Station",a:"Jatrabari, Dhaka-1204",p:"01713373150",lat:23.7082,lng:90.4368},
+    {id:'p21',n:"Demra Police Station",a:"Demra, Dhaka-1361",p:"01713373155",lat:23.7030,lng:90.4593},
+    {id:'p22',n:"Badda Police Station",a:"Badda, Dhaka-1212",p:"01769679999",lat:23.7838,lng:90.4289},
+    {id:'p23',n:"Vatara Police Station",a:"Vatara, Dhaka-1229",p:"01769670000",lat:23.8073,lng:90.4268},
+    {id:'p24',n:"Cantonment Police Station",a:"Dhaka Cantonment, Dhaka-1206",p:"01713373160",lat:23.8131,lng:90.3879},
+    {id:'p25',n:"Sher-e-Bangla Nagar Police Station",a:"Sher-e-Bangla Nagar, Dhaka-1207",p:"01713373187",lat:23.7735,lng:90.3681},
+    {id:'p26',n:"Biman Bandar Police Station",a:"Airport Rd, Dhaka-1229",p:"01713373161",lat:23.8432,lng:90.3977},
+    {id:'p27',n:"Uttara East Police Station",a:"Uttara, Sector-9, Dhaka-1230",p:"01713373162",lat:23.8650,lng:90.4120},
+    {id:'p28',n:"Turag Police Station",a:"Turag, Dhaka",p:"01713373163",lat:23.8546,lng:90.3568},
+    {id:'p29',n:"Keraniganj Police Station",a:"Keraniganj, Dhaka",p:"01713373164",lat:23.6862,lng:90.3820},
+    {id:'p30',n:"Savar Model Police Station",a:"Savar Bazar, Dhaka",p:"01713373165",lat:23.8576,lng:90.2669},
+    {id:'p31',n:"Ashulia Police Station",a:"Ashulia, Savar, Dhaka",p:"01713373166",lat:23.8792,lng:90.3040},
+    {id:'p32',n:"Narayanganj Sadar Police Station",a:"Narayanganj Sadar",p:"01713373170",lat:23.6231,lng:90.4997},
+    {id:'p33',n:"Gazipur Sadar Police Station",a:"Gazipur Sadar, Gazipur",p:"01713373175",lat:23.9999,lng:90.4148},
+    {id:'p34',n:"Tongi Police Station",a:"Tongi, Gazipur",p:"01713373176",lat:23.8984,lng:90.3997},
+    {id:'p35',n:"Rupganj Police Station",a:"Rupganj, Narayanganj",p:"01713373177",lat:23.7438,lng:90.5108},
+    {id:'p36',n:"Gendaria Police Station",a:"Gendaria, Dhaka-1204",p:"01713373116",lat:23.7109,lng:90.4234},
+    {id:'p37',n:"Sutrapur Police Station",a:"Sutrapur, Dhaka-1100",p:"01713373112",lat:23.7186,lng:90.4148},
+    {id:'p38',n:"Chawkbazar Police Station",a:"Chawkbazar, Dhaka-1211",p:"01713373113",lat:23.7182,lng:90.3921},
+    {id:'p39',n:"New Market Police Station",a:"New Market, Dhaka-1205",p:"01713373124",lat:23.7337,lng:90.3866},
+    {id:'p40',n:"Shahbagh Police Station",a:"Shahbagh, Dhaka-1000",p:"01713373125",lat:23.7402,lng:90.3973},
+    {id:'p41',n:"Ramna Police Station",a:"Ramna, Dhaka-1000",p:"01713373127",lat:23.7347,lng:90.4003},
+    {id:'p42',n:"Paltan Police Station",a:"Paltan, Dhaka-1000",p:"01713373128",lat:23.7338,lng:90.4097},
+    {id:'p43',n:"Motijheel Police Station",a:"Motijheel, Dhaka-1000",p:"01713373129",lat:23.7282,lng:90.4199},
+    {id:'p44',n:"Hatirjheel Police Station",a:"Hatirjheel, Dhaka-1217",p:"01713373185",lat:23.7559,lng:90.4103},
+    {id:'p45',n:"Baridhara Police Station",a:"Baridhara, Dhaka-1212",p:"01713373186",lat:23.8063,lng:90.4236},
+    {id:'p46',n:"Shyampur Police Station",a:"Shyampur, Dhaka-1204",p:"01713373152",lat:23.7052,lng:90.4478},
+    {id:'p47',n:"Kadamtali Police Station",a:"Kadamtali, Dhaka-1204",p:"01713373153",lat:23.7029,lng:90.4432},
+    {id:'p48',n:"Lalbagh South Police Station",a:"Lalbagh, Dhaka-1211",p:"01713373121",lat:23.7190,lng:90.3869},
+    {id:'p49',n:"Kamrangirchar Police Station",a:"Kamrangirchar, Dhaka",p:"01713373156",lat:23.7042,lng:90.3896},
+    {id:'p50',n:"Airport Police Station",a:"Airport, Dhaka-1229",p:"01713373167",lat:23.8497,lng:90.3980}
   ],
   pharmacy:[
-    {id:'ph1',n:"Popular Pharmacy — Mirpur",a:"Mirpur-1, Dhaka-1216",p:"01811000001",lat:23.7975,lng:90.3655,open24:true},
-    {id:'ph2',n:"Ibn Sina Pharmacy — Kafrul",a:"Kafrul Road, Dhaka",p:"16484",lat:23.8070,lng:90.3660,open24:true},
-    {id:'ph3',n:"Neon Pharmacy",a:"Mirpur-2, Dhaka-1216",p:"01711000050",lat:23.7998,lng:90.3602,open24:false},
-    {id:'ph4',n:"Mediaid Pharmacy — Mirpur 10",a:"Mirpur-10, Dhaka",p:"01711000051",lat:23.8085,lng:90.3571,open24:true},
-    {id:'ph5',n:"HealthCare Pharmacy — Pallabi",a:"Pallabi, Dhaka",p:"01711000052",lat:23.8228,lng:90.3627,open24:false},
-    {id:'ph6',n:"Gonoshasthaya Pharmacy",a:"Mirpur-6, Dhaka",p:"01711000053",lat:23.8133,lng:90.3615,open24:true},
-    {id:'ph7',n:"ACI Pharmacy — Mohammadpur",a:"Mohammadpur, Dhaka",p:"01711000054",lat:23.7635,lng:90.3567,open24:false},
-    {id:'ph8',n:"Square Pharmacy — Panthapath",a:"Panthapath, Dhaka-1205",p:"01711000055",lat:23.7519,lng:90.3852,open24:true},
-    {id:'ph9',n:"Medinova Pharmacy",a:"Dhanmondi-27, Dhaka",p:"01711000056",lat:23.7436,lng:90.3713,open24:false},
-    {id:'ph10',n:"Care & Cure Pharmacy",a:"Tejgaon, Dhaka",p:"01711000057",lat:23.7619,lng:90.3951,open24:true}
+    {id:'ph1',n:"Popular Pharmacy Mirpur-1",a:"Mirpur-1, Dhaka-1216",p:"01811000001",lat:23.7975,lng:90.3655,open24:true},
+    {id:'ph2',n:"Ibn Sina Pharmacy Kafrul",a:"Kafrul Road, Dhaka",p:"16484",lat:23.8070,lng:90.3660,open24:true},
+    {id:'ph3',n:"Neon Pharmacy Mirpur-2",a:"Mirpur-2, Dhaka-1216",p:"01711000050",lat:23.7998,lng:90.3602,open24:false},
+    {id:'ph4',n:"Mediaid Pharmacy Mirpur-10",a:"Mirpur-10, Dhaka",p:"01711000051",lat:23.8085,lng:90.3571,open24:true},
+    {id:'ph5',n:"HealthCare Pharmacy Pallabi",a:"Pallabi, Dhaka",p:"01711000052",lat:23.8228,lng:90.3627,open24:false},
+    {id:'ph6',n:"Gonoshasthaya Pharmacy Mirpur-6",a:"Mirpur-6, Dhaka",p:"01711000053",lat:23.8133,lng:90.3615,open24:true},
+    {id:'ph7',n:"ACI Pharmacy Mohammadpur",a:"Mohammadpur, Dhaka",p:"01711000054",lat:23.7635,lng:90.3567,open24:false},
+    {id:'ph8',n:"Square Pharmacy Panthapath",a:"Panthapath, Dhaka-1205",p:"01711000055",lat:23.7519,lng:90.3852,open24:true},
+    {id:'ph9',n:"Medinova Pharmacy Dhanmondi",a:"Dhanmondi-27, Dhaka",p:"01711000056",lat:23.7436,lng:90.3713,open24:false},
+    {id:'ph10',n:"Care & Cure Pharmacy Tejgaon",a:"Tejgaon, Dhaka",p:"01711000057",lat:23.7619,lng:90.3951,open24:true},
+    {id:'ph11',n:"Lazz Pharma Gulshan",a:"Gulshan-1, Dhaka-1212",p:"01811000011",lat:23.7857,lng:90.4116,open24:true},
+    {id:'ph12',n:"Noor Pharmacy Banani",a:"Banani, Dhaka-1213",p:"01811000012",lat:23.7937,lng:90.4031,open24:false},
+    {id:'ph13',n:"HealthAid Pharmacy Uttara",a:"Sector-3, Uttara, Dhaka-1230",p:"01811000013",lat:23.8700,lng:90.3970,open24:true},
+    {id:'ph14',n:"City Pharmacy Motijheel",a:"Motijheel, Dhaka-1000",p:"01811000014",lat:23.7282,lng:90.4199,open24:true},
+    {id:'ph15',n:"Labaid Pharmacy Dhanmondi",a:"Road 8, Dhanmondi, Dhaka",p:"01811000015",lat:23.7480,lng:90.3748,open24:true},
+    {id:'ph16',n:"Dhaka Pharmacy Shahbagh",a:"Shahbagh, Dhaka-1000",p:"01811000016",lat:23.7400,lng:90.3970,open24:true},
+    {id:'ph17',n:"Al-Fatah Pharmacy Jatrabari",a:"Jatrabari, Dhaka-1204",p:"01811000017",lat:23.7076,lng:90.4373,open24:false},
+    {id:'ph18',n:"Crescent Pharmacy Khilgaon",a:"Khilgaon, Dhaka-1219",p:"01811000018",lat:23.7479,lng:90.4292,open24:true},
+    {id:'ph19',n:"Delta Pharmacy Rampura",a:"Rampura, Dhaka-1219",p:"01811000019",lat:23.7560,lng:90.4350,open24:false},
+    {id:'ph20',n:"Bismillah Pharmacy Lalbagh",a:"Lalbagh, Dhaka-1211",p:"01811000020",lat:23.7208,lng:90.3884,open24:false},
+    {id:'ph21',n:"New Life Pharmacy Wari",a:"Wari, Dhaka-1203",p:"01811000021",lat:23.7198,lng:90.4143,open24:true},
+    {id:'ph22',n:"Green Cross Pharmacy Shantinagar",a:"Shantinagar, Dhaka-1217",p:"01811000022",lat:23.7403,lng:90.4051,open24:true},
+    {id:'ph23',n:"Modern Pharmacy Tejgaon",a:"Tejgaon, Dhaka-1208",p:"01811000023",lat:23.7650,lng:90.3978,open24:false},
+    {id:'ph24',n:"Life Aid Pharmacy Badda",a:"Badda, Dhaka-1212",p:"01811000024",lat:23.7838,lng:90.4289,open24:true},
+    {id:'ph25',n:"Plus Point Pharmacy Mirpur-12",a:"Mirpur-12, Dhaka-1216",p:"01811000025",lat:23.8230,lng:90.3580,open24:true},
+    {id:'ph26',n:"Savar Model Pharmacy",a:"Savar Bazar, Dhaka",p:"01811000026",lat:23.8576,lng:90.2669,open24:true},
+    {id:'ph27',n:"Narayanganj City Pharmacy",a:"Narayanganj Sadar",p:"01811000027",lat:23.6231,lng:90.4997,open24:false},
+    {id:'ph28',n:"Tongi Pharmacy",a:"Tongi, Gazipur",p:"01811000028",lat:23.8984,lng:90.3997,open24:true},
+    {id:'ph29',n:"Bashundhara Pharmacy",a:"Bashundhara R/A, Dhaka",p:"01811000029",lat:23.8133,lng:90.4300,open24:true},
+    {id:'ph30',n:"Dhanmondi-32 Pharmacy",a:"Road 32, Dhanmondi, Dhaka",p:"01811000030",lat:23.7452,lng:90.3701,open24:true},
+    {id:'ph31',n:"Hatirpool Pharmacy",a:"Hatirpool, Dhaka-1205",p:"01811000031",lat:23.7350,lng:90.3841,open24:false},
+    {id:'ph32',n:"Kalabagan Pharmacy",a:"Kalabagan, Dhaka-1205",p:"01811000032",lat:23.7430,lng:90.3791,open24:true},
+    {id:'ph33',n:"Elephant Road Medical Store",a:"Elephant Rd, Dhaka-1205",p:"01811000033",lat:23.7361,lng:90.3878,open24:true},
+    {id:'ph34',n:"Shyamoli Pharmacy",a:"Shyamoli, Dhaka-1207",p:"01811000034",lat:23.7728,lng:90.3567,open24:false},
+    {id:'ph35',n:"Azimpur Pharmacy",a:"Azimpur, Dhaka-1205",p:"01811000035",lat:23.7279,lng:90.3861,open24:true},
+    {id:'ph36',n:"Baridhara D.O.H.S. Pharmacy",a:"Baridhara D.O.H.S., Dhaka",p:"01811000036",lat:23.8063,lng:90.4236,open24:false},
+    {id:'ph37',n:"Mohakhali Pharmacy",a:"Mohakhali, Dhaka-1212",p:"01811000037",lat:23.7787,lng:90.4015,open24:true},
+    {id:'ph38',n:"Keraniganj Pharmacy",a:"Keraniganj, Dhaka",p:"01811000038",lat:23.6862,lng:90.3820,open24:false},
+    {id:'ph39',n:"Farmgate Pharmacy",a:"Farmgate, Dhaka-1215",p:"01811000039",lat:23.7575,lng:90.3886,open24:true},
+    {id:'ph40',n:"Niketan Pharmacy Gulshan",a:"Niketan, Gulshan, Dhaka",p:"01811000040",lat:23.7896,lng:90.4078,open24:true}
   ],
   shelter:[
     {id:'s1',n:"Mirpur Cyclone Shelter No. 1",a:"Mirpur-1, Dhaka-1216",p:"02-9001100",lat:23.7975,lng:90.3592,capacity:500},
-    {id:'s2',n:"Pallabi Community Relief Centre",a:"Pallabi, Dhaka",p:"02-9002200",lat:23.8236,lng:90.3595,capacity:300},
-    {id:'s3',n:"Kafrul Emergency Shelter",a:"Kafrul, Dhaka",p:"02-9003300",lat:23.8063,lng:90.3694,capacity:400},
-    {id:'s4',n:"Mohammadpur Relief Centre",a:"Mohammadpur, Dhaka-1205",p:"02-9004400",lat:23.7630,lng:90.3521,capacity:600},
-    {id:'s5',n:"Sher-e-Bangla Nagar Shelter",a:"Sher-e-Bangla Nagar",p:"02-9005500",lat:23.7730,lng:90.3669,capacity:800},
-    {id:'s6',n:"Uttara Emergency Relief Center",a:"Uttara, Sector-7, Dhaka",p:"02-9006600",lat:23.8758,lng:90.3951,capacity:350},
-    {id:'s7',n:"Tejgaon Industrial Shelter",a:"Tejgaon, Dhaka",p:"02-9007700",lat:23.7584,lng:90.3920,capacity:250}
+    {id:'s2',n:"Pallabi Community Relief Centre",a:"Pallabi, Dhaka-1216",p:"02-9002200",lat:23.8236,lng:90.3595,capacity:300},
+    {id:'s3',n:"Kafrul Emergency Shelter",a:"Kafrul, Dhaka-1206",p:"02-9003300",lat:23.8063,lng:90.3694,capacity:400},
+    {id:'s4',n:"Mohammadpur Relief Centre",a:"Mohammadpur, Dhaka-1207",p:"02-9004400",lat:23.7630,lng:90.3521,capacity:600},
+    {id:'s5',n:"Sher-e-Bangla Nagar Shelter",a:"Sher-e-Bangla Nagar, Dhaka-1207",p:"02-9005500",lat:23.7730,lng:90.3669,capacity:800},
+    {id:'s6',n:"Uttara Emergency Relief Center",a:"Uttara, Sector-7, Dhaka-1230",p:"02-9006600",lat:23.8758,lng:90.3951,capacity:350},
+    {id:'s7',n:"Tejgaon Industrial Shelter",a:"Tejgaon, Dhaka-1208",p:"02-9007700",lat:23.7584,lng:90.3920,capacity:250},
+    {id:'s8',n:"Demra Cyclone Shelter",a:"Demra, Dhaka-1361",p:"02-9008800",lat:23.7030,lng:90.4593,capacity:400},
+    {id:'s9',n:"Jatrabari Relief Centre",a:"Jatrabari, Dhaka-1204",p:"02-9009900",lat:23.7076,lng:90.4373,capacity:300},
+    {id:'s10',n:"Lalbagh Emergency Shelter",a:"Lalbagh, Dhaka-1211",p:"02-9010000",lat:23.7208,lng:90.3884,capacity:200},
+    {id:'s11',n:"Badda Relief Camp",a:"Badda, Dhaka-1212",p:"02-9011111",lat:23.7838,lng:90.4289,capacity:500},
+    {id:'s12',n:"Savar Upazila Shelter",a:"Savar Bazar, Savar, Dhaka",p:"02-7703002",lat:23.8576,lng:90.2669,capacity:600},
+    {id:'s13',n:"Narayanganj District Shelter",a:"Narayanganj Sadar",p:"02-7640162",lat:23.6231,lng:90.4997,capacity:800},
+    {id:'s14',n:"Gazipur City Shelter",a:"Gazipur Sadar, Gazipur",p:"02-9251001",lat:23.9999,lng:90.4148,capacity:500},
+    {id:'s15',n:"Tongi Emergency Relief Centre",a:"Tongi, Gazipur",p:"02-9812345",lat:23.8984,lng:90.3997,capacity:300},
+    {id:'s16',n:"Rampura Flood Shelter",a:"Rampura, Dhaka-1219",p:"02-9012222",lat:23.7560,lng:90.4350,capacity:250},
+    {id:'s17',n:"Keraniganj Shelter",a:"Keraniganj, Dhaka",p:"02-9013333",lat:23.6862,lng:90.3820,capacity:400},
+    {id:'s18',n:"Gulshan Community Hall Shelter",a:"Gulshan-2, Dhaka-1212",p:"02-9014444",lat:23.7926,lng:90.4148,capacity:150},
+    {id:'s19',n:"Motijheel Relief Centre",a:"Motijheel, Dhaka-1000",p:"02-9015555",lat:23.7282,lng:90.4199,capacity:200},
+    {id:'s20',n:"Dhanmondi Emergency Shelter",a:"Dhanmondi-27, Dhaka",p:"02-9016666",lat:23.7436,lng:90.3713,capacity:180}
   ],
   blood:[
     {id:'d1',n:"Karim Uddin",bt:"O+",lat:23.7978,lng:90.3680,av:true,p:"01711000001"},
@@ -839,18 +1052,35 @@ const DATA={
     {id:'d11',n:"Rekha Roy",bt:"B+",lat:23.7963,lng:90.3745,av:true,p:"01711000011"},
     {id:'d12',n:"Mizan Rahman",bt:"O+",lat:23.8043,lng:90.3656,av:true,p:"01711000012"},
     {id:'d13',n:"Farhana Begum",bt:"A+",lat:23.7876,lng:90.3812,av:true,p:"01711000013"},
-    {id:'d14',n:"Dilruba Akter",bt:"O-",lat:23.7995,lng:90.3726,av:true,p:"01711000015"}
+    {id:'d14',n:"Dilruba Akter",bt:"O-",lat:23.7995,lng:90.3726,av:true,p:"01711000014"},
+    {id:'d15',n:"Shakil Hossain",bt:"B+",lat:23.7921,lng:90.3762,av:true,p:"01711000015"},
+    {id:'d16',n:"Nasrin Sultana",bt:"AB+",lat:23.7843,lng:90.3698,av:false,p:"01711000016"},
+    {id:'d17',n:"Arif Billah",bt:"O+",lat:23.8110,lng:90.3620,av:true,p:"01711000017"},
+    {id:'d18',n:"Shila Khatun",bt:"A-",lat:23.8001,lng:90.3744,av:true,p:"01711000018"},
+    {id:'d19',n:"Tanvir Ahmed",bt:"B-",lat:23.7899,lng:90.3821,av:true,p:"01711000019"},
+    {id:'d20',n:"Popi Akter",bt:"AB-",lat:23.8065,lng:90.3778,av:false,p:"01711000020"},
+    {id:'d21',n:"Imran Hossain",bt:"O+",lat:23.7945,lng:90.3685,av:true,p:"01711000021"},
+    {id:'d22',n:"Roksana Parvin",bt:"A+",lat:23.8033,lng:90.3640,av:true,p:"01711000022"},
+    {id:'d23',n:"Habibur Rahman",bt:"B+",lat:23.7882,lng:90.3760,av:false,p:"01711000023"},
+    {id:'d24',n:"Mitu Begum",bt:"O-",lat:23.7968,lng:90.3710,av:true,p:"01711000024"},
+    {id:'d25',n:"Kamrul Islam",bt:"AB+",lat:23.8098,lng:90.3853,av:true,p:"01711000025"},
+    {id:'d26',n:"Shahnaz Akter",bt:"A-",lat:23.7853,lng:90.3792,av:true,p:"01711000026"},
+    {id:'d27',n:"Belal Uddin",bt:"B-",lat:23.7924,lng:90.3831,av:false,p:"01711000027"},
+    {id:'d28',n:"Fatema Khatun",bt:"O+",lat:23.8020,lng:90.3663,av:true,p:"01711000028"},
+    {id:'d29',n:"Raihan Islam",bt:"A+",lat:23.7870,lng:90.3724,av:true,p:"01711000029"},
+    {id:'d30',n:"Lovely Begum",bt:"AB-",lat:23.8047,lng:90.3815,av:true,p:"01711000030"}
   ]
 };
 
+
 const SVC_META={
-  hospital:{label:'Hospital',color:'#E53935',bg:'#FFEBEE',icon:'🏥',count:'45'},
-  pharmacy:{label:'Pharmacy',color:'#2E7D32',bg:'#E8F5E9',icon:'💊',count:'200+'},
-  fire:    {label:'Fire Station',color:'#E65100',bg:'#FFF3E0',icon:'🔥',count:'18'},
-  police:  {label:'Police Station',color:'#1565C0',bg:'#E3F2FD',icon:'👮',count:'50'},
-  shelter: {label:'Emergency Shelter',color:'#6A1B9A',bg:'#F3E5F5',icon:'🏠',count:'7'},
-  blood:   {label:'Blood Donor',color:'#C62828',bg:'#FFEBEE',icon:'🩸',count:'All types'},
-  news:    {label:'Disaster News',color:'#E65100',bg:'#FFFDE7',icon:'📡',count:'Live'}
+  hospital:{label:'Hospital',color:'#E53935',bg:'#FFEBEE',icon:'🏥',count:'45 hospitals'},
+  pharmacy:{label:'Pharmacy',color:'#2E7D32',bg:'#E8F5E9',icon:'💊',count:'40 pharmacies'},
+  fire:    {label:'Fire Station',color:'#E65100',bg:'#FFF3E0',icon:'🔥',count:'25 stations'},
+  police:  {label:'Police Station',color:'#1565C0',bg:'#E3F2FD',icon:'👮',count:'50 stations'},
+  shelter: {label:'Emergency Shelter',color:'#6A1B9A',bg:'#F3E5F5',icon:'🏠',count:'20 shelters'},
+  blood:   {label:'Blood Donor',color:'#C62828',bg:'#FFEBEE',icon:'🩸',count:'30 donors'},
+  news:    {label:'Disaster News',color:'#E65100',bg:'#FFFDE7',icon:'📡',count:'Live feed'}
 };
 
 const FALLBACK_NEWS=[
@@ -946,41 +1176,94 @@ function updateLocBar(){
   dot.className='loc-dot '+(S.locMode==='gps'?'gps':S.locMode==='manual'?'manual':'default');
   label.textContent=S.locMode==='gps'?'GPS Location':S.locMode==='manual'?'Manual Location':'Default Location';
   addr.textContent=S.locAddr;
+  // ── Sync hero section ──
+  const heroAddr=document.getElementById('hero-loc-addr');
+  const heroText=document.getElementById('hero-live-text');
+  const heroDot=document.getElementById('hero-live-dot');
+  if(heroAddr) heroAddr.textContent=S.locAddr.replace(' (GPS)','').replace(' (Manual)','').replace(' (GPS Live)','');
+  if(heroText){
+    if(S.locMode==='gps') heroText.textContent='Live GPS · '+S.locAddr.replace(' (GPS)','').replace(' (GPS Live)','');
+    else if(S.locMode==='manual') heroText.textContent='Manual · '+S.locAddr.replace(' (Manual)','');
+    else heroText.textContent='Default · Kafrul, Mirpur, Dhaka';
+  }
+  if(heroDot){
+    heroDot.style.background=S.locMode==='gps'?'#4CAF50':S.locMode==='manual'?'#FF9800':'#9E9E9E';
+  }
 }
 
 function requestGPS(){
   const btn=document.getElementById('gps-btn');
   btn.innerHTML='<svg class="spin" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Detecting…';
   if(!navigator.geolocation){alert('GPS not supported');btn.innerHTML='Use My GPS Location';return;}
-  navigator.geolocation.getCurrentPosition(pos=>{
+  navigator.geolocation.getCurrentPosition(async pos=>{
     S.userLat=pos.coords.latitude;
     S.userLng=pos.coords.longitude;
-    S.locAddr=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)} (GPS)`;
     S.locMode='gps';
+    S.locAddr=getNearestAreaName(pos.coords.latitude,pos.coords.longitude);
     persist();updateLocBar();
     const box=document.getElementById('loc-current-box');
     const txt=document.getElementById('loc-current-text');
     box.style.display='flex';
-    txt.textContent=S.locAddr;
+    txt.textContent='Getting address…';
+    try{
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&addressdetails=1',{headers:{'Accept-Language':'en-US,en'},signal:AbortSignal.timeout(7000)});
+      if(r.ok){
+        const d=await r.json();const addr=d.address||{};const parts=[];
+        if(addr.neighbourhood||addr.suburb)parts.push(addr.neighbourhood||addr.suburb);
+        if(addr.city_district||addr.town)parts.push(addr.city_district||addr.town);
+        if(addr.city||addr.county)parts.push(addr.city||addr.county);
+        if(addr.state)parts.push(addr.state);
+        if(parts.length>0){S.locAddr=parts.join(', ');persist();updateLocBar();txt.textContent=S.locAddr;}
+      }
+    }catch(e){txt.textContent=S.locAddr;}
     btn.innerHTML='✅ GPS Location Set!';
     setTimeout(()=>{
       btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg> Use My GPS Location';
       closeLocModal();
-      // Re-render if on service view
       if(S.activeService) renderServiceList(S.activeService);
-    },1200);
-    // Start watching position
+    },1800);
     if(S.watchId) navigator.geolocation.clearWatch(S.watchId);
-    S.watchId=navigator.geolocation.watchPosition(p2=>{
-      S.userLat=p2.coords.latitude;
-      S.userLng=p2.coords.longitude;
-      S.locAddr=`${p2.coords.latitude.toFixed(5)}, ${p2.coords.longitude.toFixed(5)} (GPS Live)`;
-      updateLocBar();
-    },{enableHighAccuracy:true,timeout:10000,maximumAge:5000});
+    S._lastGeoLat=pos.coords.latitude;S._lastGeoLng=pos.coords.longitude;
+    S.watchId=navigator.geolocation.watchPosition(async p2=>{
+      S.userLat=p2.coords.latitude;S.userLng=p2.coords.longitude;
+      if(!S._lastGeoLat||haversine(S._lastGeoLat,S._lastGeoLng,p2.coords.latitude,p2.coords.longitude)>0.05){
+        S._lastGeoLat=p2.coords.latitude;S._lastGeoLng=p2.coords.longitude;
+        try{
+          const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+p2.coords.latitude+'&lon='+p2.coords.longitude+'&format=json&addressdetails=1',{headers:{'Accept-Language':'en-US,en'},signal:AbortSignal.timeout(5000)});
+          if(r.ok){const d=await r.json();const addr=d.address||{};const parts=[];
+            if(addr.neighbourhood||addr.suburb)parts.push(addr.neighbourhood||addr.suburb);
+            if(addr.city_district||addr.town)parts.push(addr.city_district||addr.town);
+            if(addr.city||addr.county)parts.push(addr.city||addr.county);
+            if(parts.length>0){S.locAddr=parts.join(', ');persist();updateLocBar();}}
+        }catch(e){S.locAddr=getNearestAreaName(p2.coords.latitude,p2.coords.longitude);persist();updateLocBar();}
+      }
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:8000});
   },err=>{
-    btn.innerHTML='❌ GPS Error — Try Manual';
-    S.locMode='default';
-  },{enableHighAccuracy:true,timeout:10000});
+    btn.innerHTML='❌ GPS Error — Try Manual';S.locMode='default';
+  },{enableHighAccuracy:true,timeout:12000});
+}
+
+function getNearestAreaName(lat,lng){
+  const areas=[
+    {n:'Kafrul, Mirpur, Dhaka',lat:23.8072,lng:90.3648},{n:'Pallabi, Mirpur, Dhaka',lat:23.8243,lng:90.3626},
+    {n:'Mirpur-10, Dhaka',lat:23.8085,lng:90.3571},{n:'Mirpur-2, Dhaka',lat:23.7998,lng:90.3602},
+    {n:'Gulshan-2, Dhaka',lat:23.7926,lng:90.4148},{n:'Banani, Dhaka',lat:23.7937,lng:90.4031},
+    {n:'Uttara, Dhaka',lat:23.8730,lng:90.3994},{n:'Mohammadpur, Dhaka',lat:23.7639,lng:90.3571},
+    {n:'Dhanmondi, Dhaka',lat:23.7470,lng:90.3752},{n:'Shahbagh, Dhaka',lat:23.7399,lng:90.3963},
+    {n:'Tejgaon, Dhaka',lat:23.7612,lng:90.3945},{n:'Badda, Dhaka',lat:23.7838,lng:90.4289},
+    {n:'Rampura, Dhaka',lat:23.7560,lng:90.4350},{n:'Jatrabari, Dhaka',lat:23.7082,lng:90.4368},
+    {n:'Motijheel, Dhaka',lat:23.7282,lng:90.4199},{n:'Hazaribagh, Dhaka',lat:23.7260,lng:90.3764},
+    {n:'Lalbagh, Dhaka',lat:23.7208,lng:90.3884},{n:'Baridhara, Dhaka',lat:23.8063,lng:90.4236},
+    {n:'Bashundhara, Dhaka',lat:23.8133,lng:90.4300},{n:'Khilgaon, Dhaka',lat:23.7479,lng:90.4292},
+    {n:'Wari, Dhaka',lat:23.7198,lng:90.4143},{n:'Narayanganj',lat:23.6231,lng:90.4997},
+    {n:'Gazipur',lat:23.9999,lng:90.4148},{n:'Savar, Dhaka',lat:23.8576,lng:90.2669},
+    {n:'Tongi, Gazipur',lat:23.8984,lng:90.3997},{n:'Shyamoli, Dhaka',lat:23.7728,lng:90.3567},
+    {n:'Farmgate, Dhaka',lat:23.7575,lng:90.3886},{n:'New Market, Dhaka',lat:23.7337,lng:90.3866},
+    {n:'Azimpur, Dhaka',lat:23.7279,lng:90.3861},{n:'Ashulia, Savar',lat:23.8792,lng:90.3040}
+  ];
+  let best=areas[0];let bestDist=999;
+  for(const a of areas){const d=haversine(lat,lng,a.lat,a.lng);if(d<bestDist){bestDist=d;best=a;}}
+  return best.n;
 }
 
 function setManualLocation(){
@@ -1066,39 +1349,105 @@ function setBottomNav(id){
 // GOOGLE MAP MODAL
 // ══════════════════════════════════════════════════════════════════
 function openMapModal(item,type){
+  if(!item){return;}
   haptic(60);
-  const meta=SVC_META[type]||{};
-  document.getElementById('map-title').textContent=item.n;
-  document.getElementById('map-sub').textContent=item.a;
-  document.getElementById('map-call-link').href='tel:'+item.p;
+  const meta=SVC_META[type]||{label:type,color:'#555',bg:'#eee',icon:'📍'};
 
-  // Google Maps directions URL
-  const dest=encodeURIComponent(`${item.lat},${item.lng}`);
-  const origin=encodeURIComponent(`${S.userLat},${S.userLng}`);
-  const mapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+  // ── Name, address, badge ──
+  document.getElementById('map-title').textContent=item.n;
+  document.getElementById('map-sub').textContent=item.a||'';
+  const tb=document.getElementById('map-type-badge');
+  if(item.t){tb.textContent=item.t;tb.style.display='inline-block';}
+  else{tb.style.display='none';}
+
+  // ── Service icon badge ──
+  const badge=document.getElementById('map-svc-badge');
+  badge.textContent=meta.icon||'📍';
+  badge.style.background=meta.bg||'#eee';
+
+  // ── Distance & ETA ──
+  const km=haversine(S.userLat,S.userLng,item.lat,item.lng);
+  document.getElementById('map-dist-val').textContent=fmtDist(km);
+  // Rough ETA: average 15 km/h in Dhaka traffic
+  const mins=Math.round((km/15)*60);
+  document.getElementById('map-eta-val').textContent=mins<60?mins+' min':Math.floor(mins/60)+'h '+(mins%60)+'m';
+  document.getElementById('map-coords-val').textContent=`${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}`;
+
+  // ── Quick info chips ──
+  document.getElementById('map-phone-chip').textContent=item.p||'N/A';
+  document.getElementById('map-call-link').href='tel:'+(item.p||'999');
+  // Ambulance
+  const ac=document.getElementById('map-ambul-chip');
+  ac.style.display=item.ambulance?'flex':'none';
+  // 24/7
+  const oc=document.getElementById('map-open24-chip');
+  oc.style.display=item.open24?'flex':'none';
+  // Capacity (shelter)
+  const cc=document.getElementById('map-cap-chip');
+  if(item.capacity){cc.style.display='flex';document.getElementById('map-cap-text').textContent='Capacity: '+item.capacity;}
+  else{cc.style.display='none';}
+  // Area from address
+  const area=(item.a||'').split(',').pop().trim();
+  document.getElementById('map-area-chip').textContent=area||'Dhaka';
+
+  // ── Google Maps directions link ──
+  const mapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${S.userLat},${S.userLng}&destination=${item.lat},${item.lng}&travelmode=driving`;
   document.getElementById('map-gmaps-link').href=mapsUrl;
 
-  // Embed map using Google Static Maps (no API key needed for basic) or iframe
+  // ── OSM iframe — clear old iframe first to avoid flicker ──
   const wrap=document.getElementById('gmap-iframe-wrap');
-  const loading=document.getElementById('gmap-loading-text');
-  loading.textContent='Loading map…';
+  const overlay=document.getElementById('map-loading-overlay');
+  overlay.classList.remove('loaded');
+  // Remove any previous iframe
+  const old=wrap.querySelector('iframe');
+  if(old) old.remove();
+  // Zoom bbox based on distance
+  const pad=Math.max(0.008, Math.min(0.04, km*0.004));
+  const osmUrl=`https://www.openstreetmap.org/export/embed.html?bbox=${(item.lng-pad).toFixed(5)},${(item.lat-pad).toFixed(5)},${(item.lng+pad).toFixed(5)},${(item.lat+pad).toFixed(5)}&layer=mapnik&marker=${item.lat},${item.lng}`;
+  const iframe=document.createElement('iframe');
+  iframe.src=osmUrl;
+  iframe.title='Map of '+item.n;
+  iframe.setAttribute('loading','lazy');
+  iframe.onload=()=>overlay.classList.add('loaded');
+  // Fallback: hide overlay after 6s even if iframe doesn't fire onload
+  setTimeout(()=>overlay.classList.add('loaded'),6000);
+  wrap.appendChild(iframe);
 
-  // Use OpenStreetMap via iframe (works without API key)
-  const osmUrl=`https://www.openstreetmap.org/export/embed.html?bbox=${item.lng-0.02},${item.lat-0.02},${item.lng+0.02},${item.lat+0.02}&layer=mapnik&marker=${item.lat},${item.lng}`;
-
-  const placeholder=document.getElementById('gmap-placeholder');
-  placeholder.innerHTML=`<div style="width:100%;height:350px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-radius:0">
-    <iframe src="${osmUrl}" style="width:100%;height:350px;border:none" loading="lazy" title="Map"></iframe>
-  </div>`;
+  // ── Store current item for share ──
+  window._mapItem=item;
+  window._mapType=type;
 
   document.getElementById('map-modal').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
 function closeMapModal(e){
-  if(e.target===document.getElementById('map-modal'))
+  if(e.target===document.getElementById('map-modal')){
     document.getElementById('map-modal').classList.remove('open');
+    document.body.style.overflow='';
+  }
 }
-function closeMapModalBtn(){document.getElementById('map-modal').classList.remove('open')}
+function closeMapModalBtn(){
+  document.getElementById('map-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function sharePlace(){
+  const item=window._mapItem;
+  if(!item) return;
+  const url=`https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lng}`;
+  const text=`${item.n}\n${item.a}\n${item.p}\n${url}`;
+  if(navigator.share){
+    navigator.share({title:item.n,text:item.a,url}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text).then(()=>{
+      const btn=document.querySelector('.map-btn-share');
+      const orig=btn.innerHTML;
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="#2E7D32"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>';
+      setTimeout(()=>btn.innerHTML=orig,1800);
+    }).catch(()=>{window.open(url,'_blank');});
+  }
+}
 
 // ══════════════════════════════════════════════════════════════════
 // FAVORITES
@@ -1313,25 +1662,71 @@ let newsCache=null;
 async function loadNews(){
   const grid=document.getElementById('news-grid');
   if(!grid)return;
-
   if(newsCache){renderNews(newsCache,grid);return;}
-
-  grid.innerHTML=`<div class="news-loading" style="grid-column:1/-1">
-    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-    <div>Loading latest disaster news…</div>
-  </div>`;
-
-  // ── NEWS: Replace 'YOUR_NEWSAPI_KEY' with your key from newsapi.org (free) ──
-  const _nk='YOUR_NEWSAPI_KEY';
-  if(_nk&&_nk!=='YOUR_NEWSAPI_KEY'){
-    try{
-      const _r=await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent('bangladesh flood cyclone earthquake fire storm')}&language=en&sortBy=publishedAt&pageSize=9&apiKey=${_nk}`,{signal:AbortSignal.timeout(8000)});
-      if(_r.ok){const _d=await _r.json();if(_d.articles&&_d.articles.length){newsCache=_d.articles.map(a=>({...a,cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))}));renderNews(newsCache,grid);return;}}
-    }catch(e){}
-  }
-  // Fallback: built-in demo news
-  newsCache=FALLBACK_NEWS;
-  renderNews(newsCache,grid);
+  grid.innerHTML='<div class="news-loading" style="grid-column:1/-1"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg><div>Loading latest disaster news…</div></div>';
+  // Strategy 1: The Guardian Open Platform (free, test key works)
+  try{
+    const gUrl='https://content.guardianapis.com/search?q=bangladesh+flood+cyclone+disaster+earthquake+fire&show-fields=headline,thumbnail,trailText&page-size=9&api-key=test';
+    const proxy='https://api.allorigins.win/get?url='+encodeURIComponent(gUrl);
+    const r=await fetch(proxy,{signal:AbortSignal.timeout(8000)});
+    if(r.ok){
+      const raw=await r.json();const d=JSON.parse(raw.contents||'{}');
+      if(d.response&&d.response.results&&d.response.results.length>2){
+        newsCache=d.response.results.map(a=>({
+          title:(a.fields&&a.fields.headline)||a.webTitle,
+          description:(a.fields&&a.fields.trailText)||'',
+          url:a.webUrl,
+          urlToImage:(a.fields&&a.fields.thumbnail)||null,
+          publishedAt:a.webPublicationDate,
+          source:{name:'The Guardian'},
+          cat:detectCat(a.webTitle),emoji:catEmoji(detectCat(a.webTitle)),catColor:catColor(detectCat(a.webTitle))
+        }));
+        renderNews(newsCache,grid);return;
+      }
+    }
+  }catch(e){}
+  // Strategy 2: Daily Star RSS via rss2json
+  try{
+    const rssUrl=encodeURIComponent('https://www.thedailystar.net/rss.xml');
+    const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+rssUrl+'&count=20',{signal:AbortSignal.timeout(7000)});
+    if(r.ok){
+      const d=await r.json();
+      if(d.items&&d.items.length>0){
+        const kw=['flood','cyclone','fire','earthquake','storm','disaster','emergency','accident'];
+        let items=d.items.filter(i=>kw.some(k=>(i.title||'').toLowerCase().includes(k)));
+        if(items.length<3)items=d.items;
+        if(items.length>0){
+          newsCache=items.slice(0,9).map(a=>({
+            title:a.title,
+            description:a.description?a.description.replace(/<[^>]*>/g,'').substring(0,200):'',
+            url:a.link,urlToImage:a.thumbnail||null,publishedAt:a.pubDate,
+            source:{name:(d.feed&&d.feed.title)||'The Daily Star'},
+            cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))
+          }));
+          renderNews(newsCache,grid);return;
+        }
+      }
+    }
+  }catch(e){}
+  // Strategy 3: Prothom Alo RSS
+  try{
+    const rssUrl=encodeURIComponent('https://en.prothomalo.com/feed');
+    const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+rssUrl+'&count=15',{signal:AbortSignal.timeout(7000)});
+    if(r.ok){
+      const d=await r.json();
+      if(d.items&&d.items.length>0){
+        newsCache=d.items.slice(0,9).map(a=>({
+          title:a.title,description:a.description?a.description.replace(/<[^>]*>/g,'').substring(0,200):'',
+          url:a.link,urlToImage:a.thumbnail||null,publishedAt:a.pubDate,
+          source:{name:'Prothom Alo'},
+          cat:detectCat(a.title),emoji:catEmoji(detectCat(a.title)),catColor:catColor(detectCat(a.title))
+        }));
+        renderNews(newsCache,grid);return;
+      }
+    }
+  }catch(e){}
+  // Final fallback
+  newsCache=FALLBACK_NEWS;renderNews(newsCache,grid);
 }
 
 function detectCat(title=''){
@@ -1557,25 +1952,41 @@ function init(){
   // Auto GPS on load
   if(S.locMode!=='manual'){
     if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(pos=>{
+      navigator.geolocation.getCurrentPosition(async pos=>{
         S.userLat=pos.coords.latitude;
         S.userLng=pos.coords.longitude;
-        S.locAddr=`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS)`;
         S.locMode='gps';
+        S.locAddr=getNearestAreaName(pos.coords.latitude,pos.coords.longitude);
         persist();updateLocBar();
-        // Re-render if needed
         if(S.activeService) renderServiceList(S.activeService);
-        // Start watch
+        try{
+          const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&addressdetails=1',{headers:{'Accept-Language':'en-US,en'},signal:AbortSignal.timeout(7000)});
+          if(r.ok){const d=await r.json();const addr=d.address||{};const parts=[];
+            if(addr.neighbourhood||addr.suburb)parts.push(addr.neighbourhood||addr.suburb);
+            if(addr.city_district||addr.town)parts.push(addr.city_district||addr.town);
+            if(addr.city||addr.county)parts.push(addr.city||addr.county);
+            if(addr.state)parts.push(addr.state);
+            if(parts.length>0){S.locAddr=parts.join(', ');persist();updateLocBar();}}
+        }catch(e){}
         if(S.watchId) navigator.geolocation.clearWatch(S.watchId);
-        S.watchId=navigator.geolocation.watchPosition(p2=>{
-          S.userLat=p2.coords.latitude;
-          S.userLng=p2.coords.longitude;
-          S.locAddr=`${p2.coords.latitude.toFixed(4)}, ${p2.coords.longitude.toFixed(4)} (GPS)`;
-          updateLocBar();
-        },{enableHighAccuracy:true,timeout:10000,maximumAge:5000});
+        S._lastGeoLat=pos.coords.latitude;S._lastGeoLng=pos.coords.longitude;
+        S.watchId=navigator.geolocation.watchPosition(async p2=>{
+          S.userLat=p2.coords.latitude;S.userLng=p2.coords.longitude;
+          if(!S._lastGeoLat||haversine(S._lastGeoLat,S._lastGeoLng,p2.coords.latitude,p2.coords.longitude)>0.08){
+            S._lastGeoLat=p2.coords.latitude;S._lastGeoLng=p2.coords.longitude;
+            try{
+              const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+p2.coords.latitude+'&lon='+p2.coords.longitude+'&format=json&addressdetails=1',{headers:{'Accept-Language':'en-US,en'},signal:AbortSignal.timeout(5000)});
+              if(r.ok){const d=await r.json();const addr=d.address||{};const parts=[];
+                if(addr.neighbourhood||addr.suburb)parts.push(addr.neighbourhood||addr.suburb);
+                if(addr.city_district||addr.town)parts.push(addr.city_district||addr.town);
+                if(addr.city||addr.county)parts.push(addr.city||addr.county);
+                if(parts.length>0){S.locAddr=parts.join(', ');persist();updateLocBar();}}
+            }catch(e){S.locAddr=getNearestAreaName(p2.coords.latitude,p2.coords.longitude);persist();updateLocBar();}
+          }
+        },{enableHighAccuracy:true,timeout:15000,maximumAge:8000});
       },()=>{
-        // GPS denied — keep default
-      },{enableHighAccuracy:true,timeout:8000});
+        // GPS denied
+      },{enableHighAccuracy:true,timeout:10000});
     }
   }
 }
