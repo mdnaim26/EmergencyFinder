@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#E53935">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Emergency Finder — Dhaka</title>
+<title>Surokkha — Emergency. Anytime.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -81,7 +81,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
 }
-.topbar-inner{max-width:1200px;margin:0 auto;padding:0 16px;height:var(--nav);display:flex;align-items:center;gap:12px}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:0 16px;height:var(--nav);display:flex;align-items:center;gap:12px;justify-content: space-between}
 .topbar-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .logo-badge{width:36px;height:36px;background:var(--red);border-radius:10px;display:grid;place-items:center}
 .logo-text{font-family:var(--ffd);font-weight:900;font-size:17px;color:var(--text);letter-spacing:-.3px;line-height:1}
@@ -582,13 +582,23 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
 <!-- SPLASH -->
 <div id="splash">
   <div class="splash-cross">
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="white">
-      <rect x="16" y="4" width="8" height="32" rx="4"/>
-      <rect x="4" y="16" width="32" height="8" rx="4"/>
+    <svg width="56" height="56" viewBox="0 0 100 110" fill="none">
+      <!-- Shield outline (blue) -->
+      <path d="M50 4 L92 22 L92 58 Q92 85 50 106 Q8 85 8 58 L8 22 Z" fill="none" stroke="#3B5CB8" stroke-width="7" stroke-linejoin="round"/>
+      <!-- Inner shield highlight -->
+      <path d="M50 12 L84 27 L84 57 Q84 80 50 98 Q16 80 16 57 L16 27 Z" fill="rgba(255,255,255,.08)"/>
+      <!-- Red location pin body -->
+      <ellipse cx="50" cy="46" rx="22" ry="26" fill="#E53935"/>
+      <!-- Pin point -->
+      <path d="M38 64 Q50 82 62 64" fill="#E53935"/>
+      <!-- Gloss on pin -->
+      <ellipse cx="44" cy="38" rx="8" ry="10" fill="rgba(255,255,255,.28)"/>
+      <!-- Lightning bolt -->
+      <path d="M54 30 L44 50 L51 50 L46 66 L58 44 L51 44 Z" fill="white"/>
     </svg>
   </div>
-  <div class="splash-title">Emergency Finder</div>
-  <div class="splash-sub">DHAKA · BANGLADESH</div>
+  <div class="splash-title" style="font-size:32px;letter-spacing:-.5px">Suro<span style="color:#EF9A9A">kkha</span></div>
+  <div class="splash-sub">EMERGENCY. ANYTIME.</div>
   <div class="splash-bar"><div class="splash-progress"></div></div>
 </div>
 
@@ -643,7 +653,7 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
       </button>
       <button class="auth-guest-btn" onclick="authGuest()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        Continue as Guest (2 free uses)
+        Continue as Guest (10 free)
       </button>
       <div class="auth-toggle">Don't have an account? <span onclick="showRegister()">Create one</span></div>
     </div>
@@ -681,7 +691,7 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
       <svg width="32" height="32" viewBox="0 0 24 24" fill="#1976D2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
     </div>
     <div style="font-family:var(--ffd);font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px">Allow Location Access</div>
-    <div style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px">Emergency Finder needs your location to show the nearest hospitals, police stations, and fire departments accurately.</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px">Surokkha needs your location to show the nearest hospitals, police stations, and fire departments accurately.</div>
     <button class="auth-main-btn" style="margin-bottom:10px" onclick="locAskGPS()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06z"/></svg>
       Use My Location
@@ -699,7 +709,7 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
         <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--red)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
       </div>
       <div style="font-family:var(--ffd);font-size:24px;font-weight:900;color:var(--text);text-align:center;margin-bottom:8px">Guest Limit Reached</div>
-      <div style="font-size:14px;color:var(--text2);text-align:center;line-height:1.7;margin-bottom:24px">You've used both free guest sessions. Create a free account to continue using Emergency Finder.</div>
+      <div style="font-size:14px;color:var(--text2);text-align:center;line-height:1.7;margin-bottom:24px">You've used all 10 free guest sessions. Create a free account to continue using Surokkha.</div>
       <button class="auth-main-btn" onclick="forceLoginGo()" style="margin-bottom:10px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         Create Free Account
@@ -716,13 +726,15 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
   <div id="topbar">
     <div class="topbar-inner">
       <div class="topbar-logo">
-        <div class="logo-badge">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
-            <rect x="8" y="2" width="4" height="16" rx="2"/>
-            <rect x="2" y="8" width="16" height="4" rx="2"/>
+        <div class="logo-badge" style="background:transparent;width:38px;height:38px">
+          <svg width="36" height="40" viewBox="0 0 100 110" fill="none">
+            <path d="M50 4 L92 22 L92 58 Q92 85 50 106 Q8 85 8 58 L8 22 Z" fill="none" stroke="#3B5CB8" stroke-width="8" stroke-linejoin="round"/>
+            <ellipse cx="50" cy="46" rx="22" ry="26" fill="#E53935"/>
+            <path d="M38 64 Q50 82 62 64" fill="#E53935"/>
+            <path d="M54 30 L44 50 L51 50 L46 66 L58 44 L51 44 Z" fill="white"/>
           </svg>
         </div>
-        <div class="logo-text">Emergency Finder<small>Dhaka · Bangladesh</small></div>
+        <div class="logo-text">Suro<span style="color:var(--red)">kkha</span><small>Emergency. Anytime.</small></div>
       </div>
 
       <!-- SEARCH -->
@@ -738,7 +750,7 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
       <div class="topbar-actions">
         <div class="guest-credit-badge" id="guest-badge" title="Guest sessions remaining">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          <span class="gcb-num" id="guest-credit-num">2</span> left
+          <span class="gcb-num" id="guest-credit-num">10</span> left
         </div>
         <button class="tb-btn" id="topbar-login-btn" onclick="AUTH.user&&!AUTH.isGuest?logOut():location.reload()" title="Account" style="font-size:12px;font-weight:700;color:var(--text2)">
           <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -775,7 +787,7 @@ body.dark .t-zn{background:#0D1B3E;color:#90CAF9}
     <!-- Hero -->
     <div class="hero-banner">
       <div class="hero-inner">
-        <div class="hero-h">One Tap<br><em>Emergency Help</em></div>
+        <div class="hero-h">Suro<em>kkha</em><br><span style="font-size:clamp(15px,3vw,20px);font-weight:600;color:rgba(255,255,255,.7);font-family:var(--ff);letter-spacing:0">Emergency. Anytime.</span></div>
         <div class="hero-loc-row" id="hero-loc-row">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.5)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
           <span id="hero-loc-addr">Kafrul, Mirpur, Dhaka</span>
@@ -1273,7 +1285,7 @@ const FALLBACK_NEWS=[
 // ══════════════════════════════════════════════════════════════════
 const AUTH_KEY='ef_auth';
 const GUEST_KEY='ef_guest_uses';
-const GUEST_LIMIT=2;
+const GUEST_LIMIT=10;
 
 let AUTH={user:null,isGuest:false,guestUses:0};
 
